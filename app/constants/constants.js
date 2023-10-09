@@ -1,4 +1,4 @@
-const bearer = 'Bearer'
+const bearer = "Bearer";
 
 const getTime = () => {
   let today = new Date();
@@ -10,16 +10,19 @@ const getTime = () => {
 };
 
 const extractToken = (req) => {
-  if(req.headers.authorization && req.headers.authorization.split(' ')[0] === bearer){
-    return req.headers.authorization.split(' ')[1]
-  }else if (req.query && req.query.token){
-    return req.query.token
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === bearer
+  ) {
+    return req.headers.authorization.split(" ")[1];
+  } else if (req.query && req.query.token) {
+    return req.query.token;
   }
-  return null
-}
+  return null;
+};
 
 module.exports = {
   default_role: 1,
   getTime,
-  extractToken
+  extractToken,
 };

@@ -5,12 +5,15 @@ const constants = require("../constants/constants");
 const controllerName = "items";
 const MainModel = require(__path_models + controllerName);
 
+const default_sort_field= "createAt"
+const default_sort_type= "desc"
+
 router.get("/", async (req, res, next) => {
   try {
     let params = [];
     params.keyword = req.query.keyword;
-    params.sortField = req.query.orderBy;
-    params.sortType = req.query.orderDir;
+    params.sortField = default_sort_field;
+    params.sortType = default_sort_type;
 
     const data = await MainModel.listItems(params, { task: "all" });
     res.status(200).json({
@@ -45,11 +48,18 @@ router.post("/add", async (req, res, next) => {
   // res.send('add item')
 
   try {
-    let params = [];
-    params.id = makeId(8);
-    params.name = req.body.name;
-    params.status = req.body.status;
-    params.createAt = constants.getTime()
+    let params = {
+      id: makeId(8),
+      name: req.body.name || "",
+      status: req.body.status || "",
+      img: req.body.img || "",
+      price: req.body.price || "",
+      salePrice: req.body.salePrice || "",
+      description: req.body.description || "",
+      available: req.body.available || "",
+      sold: req.body.sold || "",
+      createAt: constants.getTime(),
+    };
 
     const data = await MainModel.create(params);
 

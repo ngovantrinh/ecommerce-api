@@ -75,20 +75,21 @@ router.post("/register", async (req, res, next) => {
   }
 
   const password = await bcrypt.hash(plainTextPassword, 10);
+  let data = {
+    username: username,
+    password: password,
+    displayName: displayName || "",
+    role: constants.default_role,
+    email: email || "",
+    phoneNumber: phoneNumber || "",
+    country: country || "",
+    address: address || "",
+    zipCode: zipCode || "",
+    photoUrl: photoUrl || "",
+    createAt: constants.getTime(),
+  };
   try {
-    await MainModel.create({
-      username,
-      password,
-      role: constants.default_role,
-      displayName,
-      email,
-      phoneNumber,
-      country,
-      address,
-      zipCode,
-      photoUrl,
-      createAt: constants.getTime(),
-    });
+    await MainModel.create(data);
     res.status(200).json({
       success: true,
     });
@@ -109,16 +110,16 @@ router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const user = await Users.findOne({ username });
+    const userInfo = await Users.findOne({ username });
 
-    if (!user) {
+    if (!userInfo) {
       return res.status(401).json({
         success: false,
         message: "User doesn't exist",
       });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    const isPasswordCorrect = await bcrypt.compare(password, userInfo.password);
 
     if (!isPasswordCorrect) {
       return res.status(401).json({
@@ -126,9 +127,8 @@ router.post("/login", async (req, res, next) => {
         message: "Invalid credentials",
       });
     }
-
     const access_token = jwt.sign(
-      { id: user._id, username: user.username },
+      { id: userInfo._id, username: userInfo.username },
       process.env.JWT_SECRET,
       {
         expiresIn: "2h",
@@ -137,6 +137,18 @@ router.post("/login", async (req, res, next) => {
     return res.status(200).json({
       success: true,
       access_token,
+      user: {
+        username: userInfo.username,
+        displayName: userInfo.displayName,
+        email: userInfo.email,
+        phoneNumber: userInfo.phoneNumber,
+        country: userInfo.country,
+        address: userInfo.address,
+        zipCode: userInfo.zipCode,
+        photoUrl: userInfo.photoUrl,
+        role: userInfo.role,
+        createAt: userInfo.createAt,
+      },
     });
   } catch (error) {
     res.status(400).json({
@@ -146,15 +158,19 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.post("/userDetail", async (req, res, next) => {
+router.get("/userDetail", async (req, res, next) => {
   // res.send('Get all  items')
   try {
-    if(constants.extractToken(req) === null) return res.status(404).json({
-      success: false,
-      message: "Don't have token",
-    })
+    if (constants.extractToken(req) === null)
+      return res.status(404).json({
+        success: false,
+        message: "Don't have token",
+      });
 
-    let dataJwt = await jwt.verify(constants.extractToken(req), process.env.JWT_SECRET);
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
 
     const { username } = dataJwt;
     const user = await Users.findOne({ username });
@@ -174,7 +190,6 @@ router.post("/userDetail", async (req, res, next) => {
         createAt: user.createAt,
       },
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
