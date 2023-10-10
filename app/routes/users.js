@@ -177,7 +177,7 @@ router.get("/userDetail", async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      data: {
+      user: {
         username: user.username,
         displayName: user.displayName,
         email: user.email,
