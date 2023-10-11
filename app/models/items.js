@@ -2,7 +2,6 @@ const MainModel = require(__path_schemas + "items");
 
 module.exports = {
   listItems: (params, option) => {
-    // return new MainModel(item)
     let sort = {};
     let objWhere = {};
     if (params.keyword !== "") objWhere.name = new RegExp(params.keyword, "i");
