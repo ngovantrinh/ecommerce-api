@@ -12,7 +12,13 @@ var schema = new mongoose.Schema(
     description: String,
     available: Number,
     sold: Number,
-    createAt: String
+    createAt: String,
+    // comment: {
+    //   id: String,
+    //   userId: String,
+    //   content: String,
+    //   productId: String,
+    // },
   },
   { collection: "items" }
 );

@@ -4,7 +4,7 @@ const databaseConfig = require(__path_configs + "database");
 var schema = new mongoose.Schema(
   {
     id: String,
-    productId: Number,
+    productId: String,
     variantName: String,
     variantDescription: String,
     priceProduct: Number,
@@ -12,7 +12,6 @@ var schema = new mongoose.Schema(
     sold: Number,
     createAt: String
   },
-  { collection: databaseConfig.col_vatiants }
 );
 
 module.exports = mongoose.model(databaseConfig.col_vatiants, schema);

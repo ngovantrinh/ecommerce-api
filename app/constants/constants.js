@@ -10,7 +10,6 @@ const getTime = () => {
 };
 
 const extractToken = (req) => {
-  console.log(req.headers);
   if (
     req.headers.authorization &&
     req.headers.authorization.split(" ")[0] === bearer

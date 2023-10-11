@@ -4,11 +4,11 @@ const databaseConfig = require(__path_configs + "database");
 var schema = new mongoose.Schema(
   {
     id: String,
-    name: String,
+    userId: String,
     content: String,
-    productId: Number,
+    productId: String,
   },
-  { collection: atabaseConfig.col_comments }
+  { collection: databaseConfig.col_comments }
 );
 
 module.exports = mongoose.model(databaseConfig.col_comments, schema);
