@@ -5,6 +5,7 @@ const constants = require("../constants/constants");
 const controllerName = "variants";
 const MainModel = require(__path_models + controllerName);
 
+const ItemsModel = require(__path_models + "items");
 
 router.get("/product/:productId", async (req, res, next) => {
   try {
@@ -54,7 +55,7 @@ router.post("/add", async (req, res, next) => {
       createAt: constants.getTime(),
     };
 
-    await MainModel.create(variant);
+    MainModel.create(variant);
 
     res.status(200).json({
       success: true,

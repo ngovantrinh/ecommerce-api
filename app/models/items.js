@@ -26,12 +26,11 @@ module.exports = {
   },
   deleteItem: (params, option) => {
     if (option.task == "one") {
-      return MainModel.delete({ id: params.id });
+      return MainModel.findOneAndDelete({ id: params.id });
     }
   },
   editItem: (params, option) => {
     if (option.task == "edit") {
-      console.log(params.body);
       return MainModel.updateOne({ id: params.id }, params.body);
     }
   },

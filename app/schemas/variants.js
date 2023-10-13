@@ -6,7 +6,7 @@ var schema = new mongoose.Schema(
     id: String,
     productId: String,
     variantName: String,
-    variantDescription: String,
+    variantDescription: Number,
     priceProduct: Number,
     available: Number,
     sold: Number,

@@ -17,6 +17,8 @@ module.exports = {
     }
   },
   findItemBySize: (params) => {
-    return MainModel.find({variantDescription: params.size}).select("productId");
+    return MainModel.find({ variantDescription: params.size }).select(
+      "productId variantDescription"
+    );
   },
 };

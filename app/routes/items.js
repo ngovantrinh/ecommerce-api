@@ -11,31 +11,16 @@ const default_sort_type = "desc";
 
 router.get("/", async (req, res, next) => {
   try {
-    let params = [];
+    let params = {};
     params.keyword = req.query.keyword;
     params.sortField = default_sort_field;
     params.sortType = default_sort_type;
-    params.size = req.query.size.split(',');
 
-    const variantsList = await VariantsModel.findItemBySize(params);
     const dataItemList = await MainModel.listItems(params, { task: "all" });
-    let listVariant = [];
-    let itemProductId = "";
-    for (let i = 0; i < dataItemList.length; i++) {
-      for (let j = 0; j < variantsList.length; j++) {
-        if (
-          dataItemList[i].id === variantsList[j].productId &&
-          variantsList[j].productId !== itemProductId
-        ) {
-          listVariant.push(dataItemList[i]);
-          itemProductId = variantsList[j].productId;
-        }
-      }
-    }
 
     res.status(200).json({
       success: true,
-      data: listVariant,
+      data: dataItemList,
     });
   } catch (error) {
     res.status(400).json({
@@ -94,14 +79,13 @@ router.post("/add", async (req, res, next) => {
 router.put("/edit/:id", async (req, res, next) => {
   try {
     let body = req.body;
-    const data = await MainModel.editItem(
+    await MainModel.editItem(
       { id: req.params.id, body: body },
       { task: "edit" }
     );
 
     res.status(200).json({
       success: true,
-      data: data,
     });
   } catch (error) {
     res.status(400).json({
@@ -110,9 +94,9 @@ router.put("/edit/:id", async (req, res, next) => {
   }
 });
 
-router.delete("/delete", async (req, res, next) => {
+router.delete("/delete/:id", async (req, res, next) => {
   try {
-    const data = await MainModel.deleteItem(
+    await MainModel.deleteItem(
       { id: req.params.id },
       { task: "one" }
     );
