@@ -5,14 +5,26 @@ const constants = require("../constants/constants");
 const controllerName = "variants";
 const MainModel = require(__path_models + controllerName);
 
-const ItemsModel = require(__path_models + "items");
-
-router.get("/product/:productId", async (req, res, next) => {
+// router.get("/product/:productId", async (req, res, next) => {
+//   try {
+//     const data = await MainModel.listItems(
+//       { productId: req.params.productId },
+//       { task: "product" }
+//     );
+//     res.status(200).json({
+//       success: true,
+//       data: data,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//     });
+//   }
+// });
+router.get("/", async (req, res, next) => {
   try {
-    const data = await MainModel.listItems(
-      { productId: req.params.productId },
-      { task: "product" }
-    );
+    const data = await MainModel.listItems({}, { task: "all" });
+
     res.status(200).json({
       success: true,
       data: data,
@@ -23,50 +35,27 @@ router.get("/product/:productId", async (req, res, next) => {
     });
   }
 });
-router.get("/:id", async (req, res, next) => {
-  try {
-    const data = await MainModel.listItems(
-      { id: req.params.id },
-      { task: "id" }
-    );
 
-    res.status(200).json({
-      success: true,
-      data: data,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-    });
-  }
-});
+// router.post("/add", async (req, res, next) => {
+//   // res.send('add item')
+//   try {
+//     let variant = {
+//       id: makeId(8),
+//       variant: req.body.variant || "",
+//     };
 
-router.post("/add", async (req, res, next) => {
-  // res.send('add item')
-  try {
-    let variant = {
-      id: makeId(8),
-      productId: req.body.productId || "",
-      variantName: req.body.variantName || "",
-      variantDescription: req.body.variantDescription || "",
-      priceProduct: req.body.priceProduct || "",
-      available: req.body.available || "",
-      sold: req.body.sold || "",
-      createAt: constants.getTime(),
-    };
+//     MainModel.create(variant);
 
-    MainModel.create(variant);
-
-    res.status(200).json({
-      success: true,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-    });
-  }
-  next();
-});
+//     res.status(200).json({
+//       success: true,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//     });
+//   }
+//   next();
+// });
 
 // router.put("/edit/:id", async (req, res, next) => {
 //   try {
