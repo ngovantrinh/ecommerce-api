@@ -1,4 +1,5 @@
 const MainModel = require(__path_schemas + "items");
+const constants = require("../constants/constants");
 
 module.exports = {
   listItems: (params, option) => {
@@ -10,19 +11,37 @@ module.exports = {
     if (option.task == "all") {
       return MainModel.find(objWhere)
         .select(
-          "id name status img price salePrice description available sold createAt"
+          "id name image images description price salePrice quantity sold createAt"
         )
         .sort(sort);
     }
 
     if (option.task == "one") {
       return MainModel.find({ id: params.id }).select(
-        "id name status img price salePrice description available sold createAt"
+        "id name image images description price salePrice quantity sold createAt"
       );
     }
   },
-  create: (item) => {
-    return new MainModel(item).save();
+  create:  (item) => {
+    return MainModel.find()
+      .sort({ id: -1 })
+      .limit(1)
+      .then(async (data) => {
+        if (data.length) {
+          let updatedId = data[0].id + 1;
+          const newItem = {
+            id: updatedId,
+            ...item,
+          };
+          return new MainModel(newItem).save();
+        } else {
+          const newItem = {
+            id: constants.DEFAULT_ID,
+            ...item,
+          };
+          return new MainModel(newItem).save();
+        }
+      });
   },
   deleteItem: (params, option) => {
     if (option.task == "one") {

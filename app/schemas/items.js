@@ -3,22 +3,16 @@ const databaseConfig = require(__path_configs + "database");
 
 var schema = new mongoose.Schema(
   {
-    id: String,
+    id: Number,
     name: String,
-    status: String,
-    img: String,
+    image: String,
+    images: Array,
+    description: String,
     price: Number,
     salePrice: Number,
-    description: String,
-    available: Number,
+    quantity: Number,
     sold: Number,
     createAt: String,
-    // comment: {
-    //   id: String,
-    //   userId: String,
-    //   content: String,
-    //   productId: String,
-    // },
   },
   { collection: "items" }
 );

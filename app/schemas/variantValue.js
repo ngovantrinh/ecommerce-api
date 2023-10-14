@@ -4,8 +4,9 @@ const databaseConfig = require(__path_configs + "database");
 var schema = new mongoose.Schema(
   {
     id: Number,
-    variant: String,
+    variant_id: Number,
+    value: String
   },
 );
 
-module.exports = mongoose.model(databaseConfig.col_vatiants, schema);
+module.exports = mongoose.model(databaseConfig.col_vatiant_value, schema);

@@ -3,7 +3,7 @@ var router = express.Router();
 
 router.use("/", require("./users"));
 router.use("/items", require("./items"));
-router.use("/item-detail", require("./itemDetail"));
+router.use("/item-detail", require("./productVariant"));
 router.use("/variants", require("./variants"));
 router.use("/comment", require("./comment"));
 router.use("/upload", require('./uploadImage'));

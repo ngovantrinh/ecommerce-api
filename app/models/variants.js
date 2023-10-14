@@ -10,11 +10,6 @@ module.exports = {
         "id variant"
       );
     }
-    // if (option.task == "id") {
-    //   return MainModel.find({ id: params.id }).select(
-    //     "id productId variantName variantDescription priceProduct available sold createAt"
-    //   );
-    // }
   },
 
 };

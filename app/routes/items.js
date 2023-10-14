@@ -5,6 +5,10 @@ const constants = require("../constants/constants");
 const controllerName = "items";
 const MainModel = require(__path_models + controllerName);
 
+const productVariantModel = require(__path_models + "productVariant");
+const productDetailModel = require(__path_models + "productDetail");
+const VariantValueModel = require(__path_models + "variantValue");
+
 const default_sort_field = "createAt";
 const default_sort_type = "desc";
 
@@ -46,27 +50,33 @@ router.get("/:id", async (req, res, next) => {
 });
 
 router.post("/add", async (req, res, next) => {
-  // res.send('add item')
-
   try {
     let params = {
-      id: makeId(8),
-      name: req.body.name || "",
-      status: req.body.status || "",
-      img: req.body.img || "",
-      price: req.body.price || "",
-      salePrice: req.body.salePrice || "",
-      description: req.body.description || "",
-      available: req.body.available || "",
-      sold: req.body.sold || "",
+      name: req.body.name,
+      image: req.body.image,
+      images: req.body.images,
+      description: req.body.description,
+      price: req.body.price,
+      salePrice: req.body.salePrice,
+      quantity: req.body.quantity,
+      sold: 0,
       createAt: constants.getTime(),
     };
 
-    const data = await MainModel.create(params);
+    // const variantValue = VariantValueModel.listItems();
+    // console.log(variantValue);
+    // let listVariant = [];
+    // req.body.variants.forEach((item) => {
+    //   listVariant = [...listVariant, ...item.values];
+    // });
+    const finalListVariant = Array.from(new Set(listVariant));
+    await productDetailModel.create(finalListVariant);
+    let allVariants = JSON.parse(JSON.stringify(req.body.variants));
+    const dataProduct = await MainModel.create(params);
+    await productVariantModel.create(allVariants,dataProduct.id);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      data: data,
     });
   } catch (error) {
     res.status(400).json({
@@ -95,10 +105,7 @@ router.put("/edit/:id", async (req, res, next) => {
 
 router.delete("/delete/:id", async (req, res, next) => {
   try {
-    await MainModel.deleteItem(
-      { id: req.params.id },
-      { task: "one" }
-    );
+    await MainModel.deleteItem({ id: req.params.id }, { task: "one" });
 
     res.status(200).json({
       success: true,

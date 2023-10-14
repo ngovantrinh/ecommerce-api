@@ -23,6 +23,7 @@ const extractToken = (req) => {
 
 module.exports = {
   default_role: 1,
+  DEFAULT_ID: 1,
   getTime,
   extractToken,
 };
