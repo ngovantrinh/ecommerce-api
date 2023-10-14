@@ -69,7 +69,7 @@ router.post("/add", async (req, res, next) => {
     // req.body.variants.forEach((item) => {
     //   listVariant = [...listVariant, ...item.values];
     // });
-    const finalListVariant = Array.from(new Set(listVariant));
+    // const finalListVariant = Array.from(new Set(listVariant));
     await productDetailModel.create(finalListVariant);
     let allVariants = JSON.parse(JSON.stringify(req.body.variants));
     const dataProduct = await MainModel.create(params);
