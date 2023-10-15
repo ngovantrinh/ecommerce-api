@@ -16,10 +16,12 @@ router.get("/", async (req, res, next) => {
   try {
     let params = {};
     params.keyword = req.query.keyword;
-    params.sortField = default_sort_field;
-    params.sortType = default_sort_type;
+    // params.sortField = default_sort_field;
+    // params.sortType = default_sort_type;
     params.size = req.query.size;
     params.color = req.query.color;
+    params.page = req.query.page;
+    params.limit = req.query.limit;
 
     let productVariantItems = await productVariantModel.listItems();
 
@@ -59,10 +61,10 @@ router.get("/", async (req, res, next) => {
       let productVariants = [];
       let variantValue = [];
       let color = {
-        key: "",
+        key: "color",
         value: [],
       };
-      let size = { key: "", value: [] };
+      let size = { key: "size", value: [] };
 
       productVariantItems.forEach((element) => {
         if (element.product_id === newData[i].id) {
@@ -74,11 +76,15 @@ router.get("/", async (req, res, next) => {
       let variantValueList = await VariantValueModel.listItems(variantValue);
       variantValueList.forEach((element) => {
         if (element.variant_id === 1) {
-          size.key = "size";
-          size.value.push(element.value);
+          size.value.push({
+            id: element.id,
+            value: element.value,
+          });
         } else {
-          color.key = "color";
-          color.value.push(element.value);
+          color.value.push({
+            id: element.id,
+            value: element.value,
+          });
         }
       });
       newData[i].option = [color, size];

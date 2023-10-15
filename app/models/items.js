@@ -5,30 +5,32 @@ module.exports = {
   listItems: (params, option, listProductId) => {
     let sort = {};
     let objWhere = {};
+    let pagination = {
+      page: 1,
+      limit: 10,
+    };
+
     if (params.keyword !== "") objWhere.name = new RegExp(params.keyword, "i");
     if (params.sortField) sort[params.sortField] = params.sortType;
+    if (params.page) pagination.page = +params.page;
+    if (params.limit) pagination.limit = +params.limit;
     if (option.task == "all") {
-      return (
-        MainModel.find(
-          {
-            name: { $regex: objWhere.name },
+      return MainModel.find(
+        {
+          name: { $regex: objWhere.name },
+        },
+        {
+          id: {
+            $in: [...listProductId],
           },
-          {
-            id: {
-              $in: [...listProductId],
-            },
-          }
+        }
+      )
+        .skip(pagination.limit * pagination.page - pagination.limit)
+        .limit(pagination.limit)
+        .select(
+          "id name image images description price salePrice quantity sold createAt"
         )
-          // .find({
-          //   id: {
-          //     $in: [...listProductId],
-          //   },
-          // })
-          .select(
-            "id name image images description price salePrice quantity sold createAt"
-          )
-          .sort(sort)
-      );
+        .sort(sort);
     }
 
     if (option.task == "one") {
