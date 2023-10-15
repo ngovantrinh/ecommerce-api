@@ -2,14 +2,17 @@ const MainModel = require(__path_schemas + "items");
 const constants = require("../constants/constants");
 
 module.exports = {
-  listItems: (params, option) => {
+  listItems: (params, option, listProductId) => {
     let sort = {};
     let objWhere = {};
     if (params.keyword !== "") objWhere.name = new RegExp(params.keyword, "i");
     if (params.sortField) sort[params.sortField] = params.sortType;
-
     if (option.task == "all") {
-      return MainModel.find(objWhere)
+      return MainModel.find(objWhere).find({
+        id: {
+          $in: [...listProductId],
+        },
+      })
         .select(
           "id name image images description price salePrice quantity sold createAt"
         )
@@ -22,7 +25,7 @@ module.exports = {
       );
     }
   },
-  create:  (item) => {
+  create: (item) => {
     return MainModel.find()
       .sort({ id: -1 })
       .limit(1)

@@ -1,8 +1,15 @@
 const MainModel = require(__path_schemas + "variantValue");
 
 module.exports = {
-  listItems: () => {
-    return MainModel.find().select("id variant value");
-    // return new MainModel.create({ id: 13, variant_id: 2, value: "XXL" }).save();
+  listItems: (list) => {
+    if (list) {
+      return MainModel.find({
+        id: {
+          $in: [...list],
+        },
+      }).select("id variant_id value");
+    } else {
+      return MainModel.find().select("id variant_id value");
+    }
   },
 };

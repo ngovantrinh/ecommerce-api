@@ -6,7 +6,7 @@ const controllerName = "items";
 const MainModel = require(__path_models + controllerName);
 
 const productVariantModel = require(__path_models + "productVariant");
-const productDetailModel = require(__path_models + "productDetail");
+// const productDetailModel = require(__path_models + "productDetail");
 const VariantValueModel = require(__path_models + "variantValue");
 
 const default_sort_field = "createAt";
@@ -18,12 +18,75 @@ router.get("/", async (req, res, next) => {
     params.keyword = req.query.keyword;
     params.sortField = default_sort_field;
     params.sortType = default_sort_type;
+    params.size = req.query.size;
+    params.color = req.query.color;
 
-    const dataItemList = await MainModel.listItems(params, { task: "all" });
+    let productVariantItems = await productVariantModel.listItems();
 
+    let variantValueList = await VariantValueModel.listItems();
+    let sizeValue = null;
+    let colorValue = null;
+
+    for (let i = 0; i < variantValueList.length; i++) {
+      if (variantValueList[i].value === params.size) {
+        sizeValue = variantValueList[i].id;
+      }
+      if (variantValueList[i].value === params.color) {
+        colorValue = variantValueList[i].id;
+      }
+    }
+
+    let listProductId = [];
+    for (let i = 0; i < productVariantItems.length; i++) {
+      if (productVariantItems[i].values.includes(sizeValue)) {
+        listProductId.push(productVariantItems[i].product_id);
+      }
+      if (productVariantItems[i].values.includes(colorValue)) {
+        listProductId.push(productVariantItems[i].product_id);
+      }
+    }
+
+    listProductId = Array.from(new Set(listProductId));
+
+    const dataItemList = await MainModel.listItems(
+      params,
+      { task: "all" },
+      listProductId
+    );
+    const newData = JSON.parse(JSON.stringify(dataItemList));
+
+    for (let i = 0; i < newData.length; i++) {
+      let productVariants = [];
+      let variantValue = [];
+      let color = {
+        key: "",
+        value: [],
+      };
+      let size = { key: "", value: [] };
+
+      productVariantItems.forEach((element) => {
+        if (element.product_id === newData[i].id) {
+          productVariants.push(element);
+          variantValue = [...variantValue, ...element.values];
+        }
+      });
+      variantValue = Array.from(new Set(variantValue));
+      let variantValueList = await VariantValueModel.listItems(variantValue);
+      variantValueList.forEach((element) => {
+        if (element.variant_id === 1) {
+          size.key = "size";
+          size.value.push(element.value);
+        } else {
+          color.key = "color";
+          color.value.push(element.value);
+        }
+      });
+      newData[i].option = [color, size];
+      newData[i].Variants = productVariants;
+    }
     res.status(200).json({
       success: true,
-      data: dataItemList,
+      data: newData,
     });
   } catch (error) {
     res.status(400).json({
@@ -62,19 +125,9 @@ router.post("/add", async (req, res, next) => {
       sold: 0,
       createAt: constants.getTime(),
     };
-
-    // const variantValue = VariantValueModel.listItems();
-    // console.log(variantValue);
-    // let listVariant = [];
-    // req.body.variants.forEach((item) => {
-    //   listVariant = [...listVariant, ...item.values];
-    // });
-    // const finalListVariant = Array.from(new Set(listVariant));
-    await productDetailModel.create(finalListVariant);
     let allVariants = JSON.parse(JSON.stringify(req.body.variants));
     const dataProduct = await MainModel.create(params);
-    await productVariantModel.create(allVariants,dataProduct.id);
-
+    await productVariantModel.create(allVariants, dataProduct.id);
     res.status(200).json({
       success: true,
     });

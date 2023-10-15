@@ -5,9 +5,9 @@ module.exports = {
     MainModel.find()
       .sort({ id: -1 })
       .limit(1)
-      .then((data) => {
+      .then(async (data) => {
         if (data.length) {
-          let newData = allVariants.map((element, index) => {
+          let newData = await allVariants.map((element, index) => {
             return {
               id: data[0].id + index + 1,
               product_id: productId,
@@ -26,5 +26,10 @@ module.exports = {
           return MainModel.insertMany(newData);
         }
       });
+  },
+  listItems: () => {
+    return MainModel.find().select(
+      "id name product_id values quantity sku price salePrice createAt"
+    );
   },
 };
