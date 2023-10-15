@@ -76,12 +76,12 @@ router.get("/", async (req, res, next) => {
       let variantValueList = await VariantValueModel.listItems(variantValue);
       variantValueList.forEach((element) => {
         if (element.variant_id === 1) {
-          size.value.push({
+          color.value.push({
             id: element.id,
             value: element.value,
           });
         } else {
-          color.value.push({
+          size.value.push({
             id: element.id,
             value: element.value,
           });
