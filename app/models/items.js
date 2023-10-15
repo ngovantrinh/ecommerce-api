@@ -8,15 +8,27 @@ module.exports = {
     if (params.keyword !== "") objWhere.name = new RegExp(params.keyword, "i");
     if (params.sortField) sort[params.sortField] = params.sortType;
     if (option.task == "all") {
-      return MainModel.find(objWhere).find({
-        id: {
-          $in: [...listProductId],
-        },
-      })
-        .select(
-          "id name image images description price salePrice quantity sold createAt"
+      return (
+        MainModel.find(
+          {
+            name: { $regex: objWhere.name },
+          },
+          {
+            id: {
+              $in: [...listProductId],
+            },
+          }
         )
-        .sort(sort);
+          // .find({
+          //   id: {
+          //     $in: [...listProductId],
+          //   },
+          // })
+          .select(
+            "id name image images description price salePrice quantity sold createAt"
+          )
+          .sort(sort)
+      );
     }
 
     if (option.task == "one") {
