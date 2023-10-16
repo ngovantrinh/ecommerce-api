@@ -9,8 +9,8 @@ const productVariantModel = require(__path_models + "productVariant");
 // const productDetailModel = require(__path_models + "productDetail");
 const VariantValueModel = require(__path_models + "variantValue");
 
-const default_sort_field = "createAt";
-const default_sort_type = "desc";
+// const default_sort_field = "createAt";
+// const default_sort_type = "desc";
 
 router.get("/", async (req, res, next) => {
   try {

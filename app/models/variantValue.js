@@ -12,4 +12,9 @@ module.exports = {
       return MainModel.find().select("id variant_id value");
     }
   },
+  getListByVariantId: (variantId) => {
+    return MainModel.find({
+      variant_id: variantId,
+    }).select("id value");
+  },
 };

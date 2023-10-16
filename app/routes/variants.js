@@ -4,23 +4,28 @@ const constants = require("../constants/constants");
 
 const controllerName = "variants";
 const MainModel = require(__path_models + controllerName);
+const VariantValueModel = require(__path_models + "variantValue");
 
-// router.get("/product/:productId", async (req, res, next) => {
-//   try {
-//     const data = await MainModel.listItems(
-//       { productId: req.params.productId },
-//       { task: "product" }
-//     );
-//     res.status(200).json({
-//       success: true,
-//       data: data,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//     });
-//   }
-// });
+router.get("/product", async (req, res, next) => {
+  try {
+    let finalData = {};
+    const dataVariantName = await MainModel.listItems({}, { task: "all" });
+
+    for (let i = 0; i < dataVariantName.length; i++) {
+      let variantValueList = await VariantValueModel.getListByVariantId(dataVariantName[i].id);
+      finalData[dataVariantName[i].variant] = variantValueList;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: finalData,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+});
 router.get("/", async (req, res, next) => {
   try {
     const data = await MainModel.listItems({}, { task: "all" });
@@ -36,62 +41,6 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// router.post("/add", async (req, res, next) => {
-//   // res.send('add item')
-//   try {
-//     let variant = {
-//       id: makeId(8),
-//       variant: req.body.variant || "",
-//     };
-
-//     MainModel.create(variant);
-
-//     res.status(200).json({
-//       success: true,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//     });
-//   }
-//   next();
-// });
-
-// router.put("/edit/:id", async (req, res, next) => {
-//   try {
-//     let body = req.body;
-//     const data = await MainModel.editItem(
-//       { id: req.params.id, body: body },
-//       { task: "edit" }
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       data: data,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//     });
-//   }
-// });
-
-// router.delete("/delete", async (req, res, next) => {
-//   try {
-//     const data = await MainModel.deleteItem(
-//       { id: req.params.id },
-//       { task: "one" }
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//     });
-//   }
-// });
 
 module.exports = router;
 
