@@ -92,7 +92,11 @@ router.get("/", async (req, res, next) => {
     }
     res.status(200).json({
       success: true,
-      data: newData,
+      data: {
+        newData,
+        total: params.limit,
+        page: params.page,
+      },
     });
   } catch (error) {
     res.status(400).json({
@@ -102,14 +106,50 @@ router.get("/", async (req, res, next) => {
 });
 router.get("/:id", async (req, res, next) => {
   try {
+    let productVariantItems = await productVariantModel.listItems();
+
     const data = await MainModel.listItems(
-      { id: req.params.id },
+      { id: +req.params.id },
       { task: "one" }
     );
 
+    const newData = JSON.parse(JSON.stringify(data));
+
+    let productVariants = [];
+    let variantValue = [];
+    let color = {
+      key: "color",
+      value: [],
+    };
+    let size = { key: "size", value: [] };
+
+    productVariantItems.forEach((element) => {
+      if (element.product_id === newData[0].id) {
+        productVariants.push(element);
+        variantValue = [...variantValue, ...element.values];
+      }
+    });
+    variantValue = Array.from(new Set(variantValue));
+    let variantValueList = await VariantValueModel.listItems(variantValue);
+    variantValueList.forEach((element) => {
+      if (element.variant_id === 1) {
+        color.value.push({
+          id: element.id,
+          value: element.value,
+        });
+      } else {
+        size.value.push({
+          id: element.id,
+          value: element.value,
+        });
+      }
+    });
+    newData[0].option = [color, size];
+    newData[0].Variants = productVariants;
+
     res.status(200).json({
       success: true,
-      data: data,
+      data: newData,
     });
   } catch (error) {
     res.status(400).json({

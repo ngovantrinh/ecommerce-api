@@ -13,7 +13,6 @@ router.get("/product", async (req, res, next) => {
 
     for (let i = 0; i < dataVariantName.length; i++) {
       let variantValueList = await VariantValueModel.getListByVariantId(dataVariantName[i].id);
-      // finalData[dataVariantName[i].variant] = variantValueList;
       finalData.push({
         key: dataVariantName[i].variant,
         value: variantValueList
