@@ -8,12 +8,16 @@ const VariantValueModel = require(__path_models + "variantValue");
 
 router.get("/product", async (req, res, next) => {
   try {
-    let finalData = {};
+    let finalData = [];
     const dataVariantName = await MainModel.listItems({}, { task: "all" });
 
     for (let i = 0; i < dataVariantName.length; i++) {
       let variantValueList = await VariantValueModel.getListByVariantId(dataVariantName[i].id);
-      finalData[dataVariantName[i].variant] = variantValueList;
+      // finalData[dataVariantName[i].variant] = variantValueList;
+      finalData.push({
+        key: dataVariantName[i].variant,
+        value: variantValueList
+      })
     }
 
     res.status(200).json({
