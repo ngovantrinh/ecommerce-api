@@ -11,7 +11,18 @@ const MainModel = require(__path_models + controllerName);
 
 router.post("/change-password", async (req, res, next) => {
   try {
-    const { access_token, newPassword: plainTextPassword } = req.body;
+    const { newPassword: plainTextPassword } = req.body;
+
+    if (constants.extractToken(req) === null)
+      return res.status(404).json({
+        success: false,
+        message: "Don't have token",
+      });
+
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
     if (!plainTextPassword || typeof plainTextPassword !== "string") {
       return res.status(404).json({
         success: false,
@@ -25,13 +36,45 @@ router.post("/change-password", async (req, res, next) => {
         message: "Password too small, Should be atleast 6 characters",
       });
     }
-    const user = jwt.verify(access_token, process.env.JWT_SECRET);
 
-    const _id = user.id;
+    const _id = dataJwt.id;
 
     const password = await bcrypt.hash(plainTextPassword, 10);
 
     await Users.updateOne({ _id }, { $set: { password } });
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: "error",
+    });
+  }
+});
+
+router.post("/update-profile", async (req, res, next) => {
+  try {
+    if (constants.extractToken(req) === null)
+      return res.status(404).json({
+        success: false,
+        message: "Don't have token",
+      });
+
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
+
+    // const { displayName,email,phoneNumber } = req.body;
+
+    const _id = dataJwt.id;
+    await Users.updateOne({ _id }, { $set: req.body });
+
+    res.status(200).json({
+      success: true,
+    });
   } catch (error) {
     return res.status(404).json({
       success: false,
