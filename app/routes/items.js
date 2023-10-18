@@ -65,6 +65,7 @@ router.get("/", async (req, res, next) => {
         value: [],
       };
       let size = { key: "size", value: [] };
+      newData[i] = { ...newData[i], option: [] };
 
       productVariantItems.forEach((element) => {
         if (element.product_id === newData[i].id) {
@@ -87,7 +88,8 @@ router.get("/", async (req, res, next) => {
           });
         }
       });
-      newData[i].option = [color, size];
+      if (color.value.length) newData[i].option.push(color);
+      if (size.value.length) newData[i].option.push(size);
       newData[i].variants = productVariants;
     }
     res.status(200).json({
@@ -123,6 +125,7 @@ router.get("/:id", async (req, res, next) => {
     };
     let size = { key: "size", value: [] };
 
+    newData[0] = { ...newData[0], option: [] };
     productVariantItems.forEach((element) => {
       if (element.product_id === newData[0].id) {
         productVariants.push(element);
@@ -144,7 +147,10 @@ router.get("/:id", async (req, res, next) => {
         });
       }
     });
-    newData[0].option = [color, size];
+    if(color.value.length) newData[0].option.push(color)
+    if(size.value.length) newData[0].option.push(size)
+    
+    // newData[0].option = [color, size];
     newData[0].variants = productVariants;
 
     res.status(200).json({
