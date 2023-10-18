@@ -65,6 +65,7 @@ router.get("/", async (req, res, next) => {
         value: [],
       };
       let size = { key: "size", value: [] };
+      let material = { key: "material", value: [] };
       newData[i] = { ...newData[i], option: [] };
 
       productVariantItems.forEach((element) => {
@@ -81,6 +82,11 @@ router.get("/", async (req, res, next) => {
             id: element.id,
             value: element.value,
           });
+        } else if (element.variant_id === 3) {
+          material.value.push({
+            id: element.id,
+            value: element.value,
+          });
         } else {
           size.value.push({
             id: element.id,
@@ -90,6 +96,7 @@ router.get("/", async (req, res, next) => {
       });
       if (color.value.length) newData[i].option.push(color);
       if (size.value.length) newData[i].option.push(size);
+      if (material.value.length) newData[i].option.push(material);
       newData[i].variants = productVariants;
     }
     res.status(200).json({
@@ -123,6 +130,7 @@ router.get("/:id", async (req, res, next) => {
       key: "color",
       value: [],
     };
+    let material = { key: "material", value: [] };
     let size = { key: "size", value: [] };
 
     newData[0] = { ...newData[0], option: [] };
@@ -140,6 +148,11 @@ router.get("/:id", async (req, res, next) => {
           id: element.id,
           value: element.value,
         });
+      } else if (element.variant_id === 3) {
+        material.value.push({
+          id: element.id,
+          value: element.value,
+        });
       } else {
         size.value.push({
           id: element.id,
@@ -147,9 +160,10 @@ router.get("/:id", async (req, res, next) => {
         });
       }
     });
-    if(color.value.length) newData[0].option.push(color)
-    if(size.value.length) newData[0].option.push(size)
-    
+    if (color.value.length) newData[0].option.push(color);
+    if (size.value.length) newData[0].option.push(size);
+    if (material.value.length) newData[0].option.push(material);
+
     // newData[0].option = [color, size];
     newData[0].variants = productVariants;
 
