@@ -145,7 +145,7 @@ router.get("/:id", async (req, res, next) => {
       }
     });
     newData[0].option = [color, size];
-    newData[0].Variants = productVariants;
+    newData[0].variants = productVariants;
 
     res.status(200).json({
       success: true,
