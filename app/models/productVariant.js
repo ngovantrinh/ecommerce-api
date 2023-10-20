@@ -27,10 +27,20 @@ module.exports = {
         }
       });
   },
-  listItems: () => {
-    return MainModel.find().select(
-      "id name product_id values quantity sku price salePrice createAt"
-    );
+  listItems: (listId) => {
+    if (listId) {
+      return MainModel.find({
+        id: {
+          $in: [...listId],
+        },
+      }).select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    } else {
+      return MainModel.find().select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    }
   },
   findOneItem: (id) => {
     return MainModel.find({ id: id }).select(

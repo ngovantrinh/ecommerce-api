@@ -2,7 +2,7 @@ const MainModel = require(__path_schemas + "cart");
 const constants = require("../constants/constants");
 module.exports = {
   getCart: () => {
-    return MainModel.find({ status: 0 }).select("id cartId userId");
+    return MainModel.findOne({ status: 0 }).select("id cartId userId");
   },
   create: async (item) => {
     await MainModel.find()

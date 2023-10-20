@@ -1,8 +1,15 @@
 const MainModel = require(__path_schemas + "cartProduct");
 const constants = require("../constants/constants");
 module.exports = {
-  getCartProduct: () => {
-    return MainModel.find({ status: 0 }).select("id cartId variantId quantity status");
+  getCartProduct: (cartId) => {
+    return MainModel.find({ cartId: cartId }).select(
+      "id cartId variantId quantity status"
+    );
+  },
+  getCartProductById: (id) => {
+    return MainModel.find({ id: id }).select(
+      "id cartId variantId quantity status"
+    );
   },
   createCart: (item) => {
     MainModel.find()
@@ -24,5 +31,14 @@ module.exports = {
           return new MainModel(newItem).save();
         }
       });
+  },
+  deleteItem: (params) => {
+    return MainModel.findOneAndDelete({ id: params.id });
+  },
+  editItem: (params) => {
+    return MainModel.updateOne(
+      { id: params.id },
+      { quantity: params.quantity }
+    );
   },
 };
