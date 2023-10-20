@@ -130,9 +130,8 @@ router.get("/getCart", async (req, res, next) => {
 
 router.put("/edit", async (req, res, next) => {
   try {
-    let productVariantItem = await cartProductModel.getCartProductById(
-      req.body.id
-    );
+    const { id, quantity } = req.body;
+    let productVariantItem = await cartProductModel.getCartProductById(id);
     let productVariant = await productVariantModel.findOneItem(
       productVariantItem[0].variantId
     );
