@@ -32,4 +32,9 @@ module.exports = {
       "id name product_id values quantity sku price salePrice createAt"
     );
   },
+  findOneItem: (id) => {
+    return MainModel.find({ id: id }).select(
+      "id name values quantity sku price salePrice createAt"
+    );
+  },
 };

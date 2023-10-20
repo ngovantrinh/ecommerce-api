@@ -10,7 +10,7 @@ module.exports = {
       limit: 10,
     };
 
-    if (params.keyword !== "") objWhere.name = new RegExp(params.keyword, "i");
+    if (params.keyword !== "" || !params.keyword) objWhere.name = new RegExp(params.keyword, "i");
     if (params.sortField) sort[params.sortField] = params.sortType;
     if (params.page) pagination.page = +params.page;
     if (params.limit) pagination.limit = +params.limit;

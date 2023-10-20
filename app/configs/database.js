@@ -11,4 +11,6 @@ module.exports = {
   col_vatiant_value: "variant_values",
   col_images: "images",
   col_copons_type: "cuponType",
+  col_cart: "cart",
+  col_cart_product: "cart_product",
 };

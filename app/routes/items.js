@@ -16,7 +16,6 @@ router.get("/", async (req, res, next) => {
   try {
     let params = {};
     params.keyword = req.query.keyword;
-    // params.sortField = default_sort_field;
     // params.sortType = default_sort_type;
     params.size = req.query.size;
     params.color = req.query.color;
