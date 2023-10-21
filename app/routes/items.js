@@ -123,6 +123,13 @@ router.get("/:id", async (req, res, next) => {
 
     const newData = JSON.parse(JSON.stringify(data));
 
+    if (!newData.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Not found product',
+      });
+    }
+
     let productVariants = [];
     let variantValue = [];
     let color = {
@@ -168,7 +175,7 @@ router.get("/:id", async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: newData,
+      data: newData[0],
     });
   } catch (error) {
     res.status(400).json({
