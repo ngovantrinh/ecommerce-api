@@ -12,7 +12,7 @@ const VariantValueModel = require(__path_models + "variantValue");
 
 router.post("/add", async (req, res, next) => {
   try {
-    const { variantId, quantity } = req.body;
+    const { cartId, variantId, quantity } = req.body;
     let productVariant = await productVariantModel.findOneItem(variantId);
     if (productVariant[0].quantity < quantity) {
       return res.status(400).json({
@@ -20,7 +20,7 @@ router.post("/add", async (req, res, next) => {
         message: "Not enough stock",
       });
     }
-    let cart = await MainModel.getCart();
+    let cart = await MainModel.getCart(cartId);
     if (!cart) {
       let data = {
         userId: null,
@@ -58,15 +58,27 @@ router.post("/add", async (req, res, next) => {
 
 router.get("/getCart", async (req, res, next) => {
   try {
+    const { cartId } = req.body;
+
     let resData = {
       idCart: 0,
       totalPreSale: 0,
       totalSale: 0,
       cart: [],
     };
+    let totalPreSale = 0;
+    let totalSale = 0;
 
-    const cart = await MainModel.getCart();
+    if (!cartId || cartId == "") {
+      return res.status(400).json({
+        success: false,
+        message: "Not have any product in your cart",
+      });
+    }
+
+    const cart = await MainModel.getCart(cartId);
     const listProductCart = await cartProductModel.getCartProduct(cart.id);
+    resData.idCart = cart.id;
     let listIdProductVariant = [];
     listProductCart.forEach((element) => {
       listIdProductVariant.push(element.variantId);
@@ -75,7 +87,6 @@ router.get("/getCart", async (req, res, next) => {
     const listProduct = await productVariantModel.listItems(
       listIdProductVariant
     );
-
     for (let i = 0; i < listProduct.length; i++) {
       const itemProduct = await ProductModel.listItems(
         { id: +listProduct[i].product_id },
@@ -112,10 +123,14 @@ router.get("/getCart", async (req, res, next) => {
             salePrice: listProduct[i].salePrice,
             optionChoose: dataVariant,
           };
+          totalPreSale += listProduct[i].price;
+          totalSale += listProduct[i].salePrice;
           resData.cart.push(result);
         }
       });
     }
+    resData.totalPreSale = totalPreSale;
+    resData.totalSale = totalSale;
 
     res.status(200).json({
       success: true,
