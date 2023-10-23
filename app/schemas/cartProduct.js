@@ -3,7 +3,7 @@ const databaseConfig = require(__path_configs + "database");
 
 var schema = new mongoose.Schema({
   id: Number,
-  cartId: Number,
+  cartId: String,
   variantId: Number,
   quantity: Number,
 });

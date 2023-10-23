@@ -2,7 +2,7 @@ const MainModel = require(__path_schemas + "cart");
 const constants = require("../constants/constants");
 module.exports = {
   getCart: (id) => {
-    return MainModel.findOne({ status: 0 }, { id: id }).select(
+    return MainModel.findOne({ status: 0 }, { _id: id }).select(
       "id cartId userId"
     );
   },
@@ -26,6 +26,9 @@ module.exports = {
           return await new MainModel(newItem).save();
         }
       });
+  },
+  findNewCart: () => {
+    return MainModel.find().sort({ id: -1 }).limit(1);
   },
   editCart: (params) => {
     return MainModel.updateOne({ id: params.id }, params.body);

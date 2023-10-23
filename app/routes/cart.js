@@ -10,10 +10,35 @@ const ProductModel = require(__path_models + "items");
 const VariantValueModel = require(__path_models + "variantValue");
 // const Users = require(__path_schemas + "users");
 
+router.post("/createCart", async (req, res, next) => {
+  try {
+    let data = {
+      userId: null,
+      status: 0,
+    };
+    await MainModel.create(data);
+    let cart = await MainModel.findNewCart();
+    res.status(200).json({
+      success: true,
+      cartId: cart[0]._id,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+});
+
 router.post("/add", async (req, res, next) => {
   try {
     const { cartId, variantId, quantity } = req.body;
     let productVariant = await productVariantModel.findOneItem(variantId);
+    if (!cartId || !variantId || !quantity) {
+      res.status(400).json({
+        success: false,
+        cartId: 'something wrong',
+      });
+    }
     if (productVariant[0].quantity < quantity) {
       return res.status(400).json({
         success: false,
@@ -28,27 +53,30 @@ router.post("/add", async (req, res, next) => {
       };
 
       await MainModel.create(data);
-      let dataCart = await MainModel.getCart();
+      let dataCart = await MainModel.findNewCart();
       let dataProductCart = {
-        cartId: dataCart.id,
+        cartId: dataCart._id,
         variantId: productVariant[0].id,
         quantity: quantity,
       };
       await cartProductModel.createCart(dataProductCart);
+      res.status(200).json({
+        success: true,
+        message: "Add item success",
+      });
     } else {
-      let dataCart = await MainModel.getCart();
+      let dataCart = await MainModel.getCart(cartId);
       let dataProductCart = {
-        cartId: dataCart.id,
+        cartId: dataCart._id,
         variantId: productVariant[0].id,
         quantity: quantity,
       };
       await cartProductModel.createCart(dataProductCart);
+      res.status(200).json({
+        success: true,
+        message: "Add item success",
+      });
     }
-
-    res.status(200).json({
-      success: true,
-      message: "Add item success",
-    });
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -77,8 +105,8 @@ router.get("/getCart", async (req, res, next) => {
     }
 
     const cart = await MainModel.getCart(cartId);
-    const listProductCart = await cartProductModel.getCartProduct(cart.id);
-    resData.idCart = cart.id;
+    const listProductCart = await cartProductModel.getCartProduct(cart._id);
+    resData.idCart = cart._id;
     let listIdProductVariant = [];
     listProductCart.forEach((element) => {
       listIdProductVariant.push(element.variantId);
@@ -168,6 +196,32 @@ router.put("/edit", async (req, res, next) => {
     });
   }
 });
+
+// router.put("/edit", async (req, res, next) => {
+//   try {
+//     const { id, quantity } = req.body;
+//     let productVariantItem = await cartProductModel.getCartProductById(id);
+//     let productVariant = await productVariantModel.findOneItem(
+//       productVariantItem[0].variantId
+//     );
+//     if (productVariant[0].quantity < quantity) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Not enough stock",
+//       });
+//     }
+//     await cartProductModel.editItem(req.body);
+//     res.status(200).json({
+//       success: true,
+//       message: "Update cart success",
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: "Update cart wrong",
+//     });
+//   }
+// });
 
 router.delete("/deleteCartProduct/:id", async (req, res, next) => {
   try {
