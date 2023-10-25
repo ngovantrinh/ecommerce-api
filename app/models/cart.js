@@ -30,7 +30,7 @@ module.exports = {
   findNewCart: () => {
     return MainModel.find().sort({ id: -1 }).limit(1);
   },
-  editCart: (params) => {
-    return MainModel.updateOne({ id: params.id }, params.body);
+  editCart: (_id, params) => {
+    return MainModel.updateOne({ _id }, { userId: params });
   },
 };

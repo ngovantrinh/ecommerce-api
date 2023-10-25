@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const constants = require("../constants/constants");
+const jwt = require("jsonwebtoken");
 
 const controllerName = "cart";
 const MainModel = require(__path_models + controllerName);
@@ -8,12 +9,12 @@ const cartProductModel = require(__path_models + "cartProduct");
 const productVariantModel = require(__path_models + "productVariant");
 const ProductModel = require(__path_models + "items");
 const VariantValueModel = require(__path_models + "variantValue");
-// const Users = require(__path_schemas + "users");
+const Users = require(__path_schemas + "users");
 
 router.post("/createCart", async (req, res, next) => {
   try {
     let data = {
-      userId: null,
+      userId: "",
       status: 0,
     };
     await MainModel.create(data);
@@ -36,7 +37,7 @@ router.post("/add", async (req, res, next) => {
     if (!cartId || !variantId || !quantity) {
       res.status(400).json({
         success: false,
-        cartId: 'something wrong',
+        cartId: "something wrong",
       });
     }
     if (productVariant[0].quantity < quantity) {
@@ -48,7 +49,7 @@ router.post("/add", async (req, res, next) => {
     let cart = await MainModel.getCart(cartId);
     if (!cart) {
       let data = {
-        userId: null,
+        userId: "",
         status: 0,
       };
 
@@ -146,13 +147,13 @@ router.get("/getCart", async (req, res, next) => {
             name: listProduct[i].name,
             image: itemProduct[0].image,
             quantity: listProduct[i].quantity,
-            quantityBy: item.quantity,
+            quantityBuy: item.quantity,
             price: listProduct[i].price,
             salePrice: listProduct[i].salePrice,
             optionChoose: dataVariant,
           };
-          totalPreSale += listProduct[i].price;
-          totalSale += listProduct[i].salePrice;
+          totalPreSale += listProduct[i].price * item.quantity;
+          totalSale += listProduct[i].salePrice * item.quantity;
           resData.cart.push(result);
         }
       });
@@ -197,31 +198,36 @@ router.put("/edit", async (req, res, next) => {
   }
 });
 
-// router.put("/edit", async (req, res, next) => {
-//   try {
-//     const { id, quantity } = req.body;
-//     let productVariantItem = await cartProductModel.getCartProductById(id);
-//     let productVariant = await productVariantModel.findOneItem(
-//       productVariantItem[0].variantId
-//     );
-//     if (productVariant[0].quantity < quantity) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Not enough stock",
-//       });
-//     }
-//     await cartProductModel.editItem(req.body);
-//     res.status(200).json({
-//       success: true,
-//       message: "Update cart success",
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//       message: "Update cart wrong",
-//     });
-//   }
-// });
+router.put("/addUserToCart", async (req, res, next) => {
+  try {
+    if (constants.extractToken(req) === null)
+      return res.status(404).json({
+        success: false,
+        message: "Don't have token",
+      });
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
+    const userInfo = await Users.findOne({ username: dataJwt.username });
+    if (!userInfo) {
+      return res.status(401).json({
+        success: false,
+        message: "User doesn't exist",
+      });
+    }
+    await MainModel.editCart(req.body.cartId, dataJwt.id);
+    res.status(200).json({
+      success: true,
+      message: "Update cart success",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Update cart wrong",
+    });
+  }
+});
 
 router.delete("/deleteCartProduct/:id", async (req, res, next) => {
   try {
