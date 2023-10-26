@@ -60,6 +60,7 @@ router.post("/add", async (req, res, next) => {
     }
 
     let cart = await MainModel.getCart(cartId);
+
     if (!cart) {
       let data = {
         userId: "",
@@ -79,9 +80,14 @@ router.post("/add", async (req, res, next) => {
         message: "Add item success",
       });
     } else {
-      let dataCart = await MainModel.getCart(cartId);
+      if (cart.id !== 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Can't find your cart",
+        });
+      }
       let dataProductCart = {
-        cartId: dataCart._id,
+        cartId: cart._id,
         variantId: productVariant[0].id,
         quantity: quantity,
       };
@@ -118,7 +124,20 @@ router.get("/getCart", async (req, res, next) => {
       });
     }
 
-    const cart = await MainModel.getCart(cartId);
+    const cart = await MainModel.getCarts(cartId);
+    if (!cart) {
+      return res.status(400).json({
+        success: false,
+        message: "Cart doesn't exist",
+      });
+    }
+
+    if (cart.id !== 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Can't find your cart",
+      });
+    }
     const listProductCart = await cartProductModel.getCartProduct(cart._id);
     resData.idCart = cart._id;
     let listIdProductVariant = [];

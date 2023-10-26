@@ -56,12 +56,13 @@ router.post("/change-password", async (req, res, next) => {
 
 router.post("/update-profile", async (req, res, next) => {
   try {
-    if (constants.extractToken(req) === null)
+    if (constants.extractToken(req) === null) {
       return res.status(404).json({
         success: false,
         message: "Don't have token",
       });
-
+    }
+    
     let dataJwt = await jwt.verify(
       constants.extractToken(req),
       process.env.JWT_SECRET
@@ -234,18 +235,19 @@ router.put("/disableUsers", async (req, res, next) => {
   try {
     const { userId } = req.body;
     const users = await MainModel.findUserById(userId);
-    if(!userId){
+    if (!userId) {
       return res.status(401).json({
         success: false,
         message: "Something went wrong",
       });
     }
-    let value = 0
+    let value = 0;
 
-    if(users.active === constants.USER_DEFAULT_ACTIVE) value = constants.USER_DEFAULT_UNACTIVE
-    else value = constants.USER_DEFAULT_ACTIVE
+    if (users.active === constants.USER_DEFAULT_ACTIVE)
+      value = constants.USER_DEFAULT_UNACTIVE;
+    else value = constants.USER_DEFAULT_ACTIVE;
 
-    await MainModel.unActiveUser(users._id,value);
+    await MainModel.unActiveUser(users._id, value);
 
     return res.status(200).json({
       success: true,

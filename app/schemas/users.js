@@ -7,7 +7,7 @@ var schema = new mongoose.Schema(
     password: { type: String, required: true },
     displayName: String,
     email: String,
-    phoneNumber: Number,
+    phoneNumber: String,
     country: String,
     address: String,
     zipCode: String,
