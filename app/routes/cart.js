@@ -80,7 +80,7 @@ router.post("/add", async (req, res, next) => {
         message: "Add item success",
       });
     } else {
-      if (cart.id !== 0) {
+      if (cart.status !== 0) {
         return res.status(400).json({
           success: false,
           message: "Can't find your cart",
@@ -117,22 +117,35 @@ router.get("/getCart", async (req, res, next) => {
     let totalPreSale = 0;
     let totalSale = 0;
 
-    if (!cartId || cartId == "") {
+    if ((!cartId || cartId == "") && !constants.extractToken(req)) {
       return res.status(400).json({
         success: false,
         message: "Not have any product in your cart",
       });
     }
 
-    const cart = await MainModel.getCarts(cartId);
+    let dataJwt = null;
+    let cart = null;
+
+    if (constants.extractToken(req)) {
+      dataJwt = await jwt.verify(
+        constants.extractToken(req),
+        process.env.JWT_SECRET
+      );
+    }
+
+    if (dataJwt) {
+      cart = await MainModel.getCartByUserId(dataJwt.id);
+    } else {
+      cart = await MainModel.getCart(cartId);
+    }
     if (!cart) {
       return res.status(400).json({
         success: false,
         message: "Cart doesn't exist",
       });
     }
-
-    if (cart.id !== 0) {
+    if (cart.status !== 0) {
       return res.status(400).json({
         success: false,
         message: "Can't find your cart",
@@ -196,6 +209,29 @@ router.get("/getCart", async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: resData,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+});
+
+router.get("/getListOrder", async (req, res, next) => {
+  try {
+    if (constants.extractToken(req) === null)
+      return res.status(404).json({
+        success: false,
+        message: "Don't have token",
+      });
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
+    console.log(dataJwt);
+
+    res.status(200).json({
+      success: true,
     });
   } catch (error) {
     res.status(400).json({

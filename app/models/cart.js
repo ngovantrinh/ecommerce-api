@@ -4,8 +4,11 @@ module.exports = {
   getCart: (_id) => {
     return MainModel.findOne({ _id: _id }).select("id userId status");
   },
-  getCarts: (_id) => {
-    return MainModel.findOne({ _id: _id }).select("id userId status");
+  getCartByUserId: (userId) => {
+    return MainModel.findOne({ userId: userId }).select("id userId status");
+  },
+  getListCartOrder: () => {
+    return MainModel.find().select("id userId status");
   },
   create: async (item) => {
     await MainModel.find()
