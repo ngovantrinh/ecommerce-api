@@ -34,6 +34,11 @@ router.post("/add", async (req, res, next) => {
   try {
     const { cartId, variantId, quantity } = req.body;
     let productVariant = await productVariantModel.findOneItem(variantId);
+
+    let productVariantItem = await cartProductModel.getCartProductByProductId(
+      variantId
+    );
+
     if (!cartId || !variantId || !quantity) {
       res.status(400).json({
         success: false,
@@ -46,6 +51,14 @@ router.post("/add", async (req, res, next) => {
         message: "Not enough stock",
       });
     }
+
+    if (productVariantItem) {
+      return res.status(400).json({
+        success: false,
+        message: "Item already exists",
+      });
+    }
+
     let cart = await MainModel.getCart(cartId);
     if (!cart) {
       let data = {

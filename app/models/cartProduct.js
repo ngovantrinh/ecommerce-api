@@ -3,12 +3,15 @@ const constants = require("../constants/constants");
 module.exports = {
   getCartProduct: (cartId) => {
     return MainModel.find({ cartId: cartId }).select(
-      "id cartId variantId quantity status"
+      "id cartId variantId quantity"
     );
   },
   getCartProductById: (id) => {
-    return MainModel.find({ id: id }).select(
-      "id cartId variantId quantity status"
+    return MainModel.find({ id: id }).select("id cartId variantId quantity");
+  },
+  getCartProductByProductId: (id) => {
+    return MainModel.findOne({ variantId: id }).select(
+      "id cartId variantId quantity"
     );
   },
   createCart: (item) => {
