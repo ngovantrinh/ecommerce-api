@@ -129,6 +129,7 @@ router.post("/register", async (req, res, next) => {
     address: address || "",
     zipCode: zipCode || "",
     photoUrl: photoUrl || "",
+    active: 1,
     createAt: constants.getTime(),
   };
   try {
@@ -153,12 +154,19 @@ router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const userInfo = await Users.findOne({ username });
+    const userInfo = await MainModel.findUserLogin(username);
 
     if (!userInfo) {
       return res.status(401).json({
         success: false,
         message: "User doesn't exist",
+      });
+    }
+
+    if (userInfo.active !== constants.USER_DEFAULT_ACTIVE) {
+      return res.status(400).json({
+        success: false,
+        message: "Account is temporarily locked",
       });
     }
 
@@ -190,8 +198,58 @@ router.post("/login", async (req, res, next) => {
         zipCode: userInfo.zipCode,
         photoUrl: userInfo.photoUrl,
         role: userInfo.role,
+        active: userInfo.active,
         createAt: userInfo.createAt,
       },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
+router.get("/getAllUser", async (req, res, next) => {
+  // res.send('Get all  items')
+
+  try {
+    const users = await MainModel.getAllUserByAdmin();
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
+router.put("/disableUsers", async (req, res, next) => {
+  // res.send('Get all  items')
+
+  try {
+    const { userId } = req.body;
+    const users = await MainModel.findUserById(userId);
+    if(!userId){
+      return res.status(401).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+    let value = 0
+
+    if(users.active === constants.USER_DEFAULT_ACTIVE) value = constants.USER_DEFAULT_UNACTIVE
+    else value = constants.USER_DEFAULT_ACTIVE
+
+    await MainModel.unActiveUser(users._id,value);
+
+    return res.status(200).json({
+      success: true,
+      message: "Success",
     });
   } catch (error) {
     res.status(400).json({
@@ -216,22 +274,11 @@ router.get("/userDetail", async (req, res, next) => {
     );
 
     const { username } = dataJwt;
-    const user = await Users.findOne({ username });
+    const userInfo = await MainModel.findUser(username);
 
     return res.status(200).json({
       success: true,
-      user: {
-        username: user.username,
-        displayName: user.displayName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        country: user.country,
-        address: user.address,
-        zipCode: user.zipCode,
-        photoUrl: user.photoUrl,
-        role: user.role,
-        createAt: user.createAt,
-      },
+      user: userInfo,
     });
   } catch (error) {
     res.status(400).json({

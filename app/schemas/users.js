@@ -13,6 +13,7 @@ var schema = new mongoose.Schema(
     zipCode: String,
     photoUrl: String,
     role: Number,
+    active: Number,
     createAt: String
   },
   { collection: databaseConfig.col_user }
