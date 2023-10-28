@@ -9,8 +9,8 @@ module.exports = {
   getCartProductById: (id) => {
     return MainModel.find({ id: id }).select("id cartId variantId quantity");
   },
-  getCartProductByProductId: (id) => {
-    return MainModel.findOne({ variantId: id }).select(
+  getCartProductByProductId: (variantId, cartId) => {
+    return MainModel.find({ cartId: cartId,variantId: variantId }).select(
       "id cartId variantId quantity"
     );
   },

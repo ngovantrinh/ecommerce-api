@@ -7,8 +7,18 @@ module.exports = {
   getCartByUserId: (userId) => {
     return MainModel.findOne({ userId: userId }).select("id userId status");
   },
-  getListCartOrder: () => {
-    return MainModel.find().select("id userId status");
+  getListCartOrder: (params, id) => {
+    let pagination = {
+      page: 1,
+      limit: 10,
+    };
+
+    if (params.page) pagination.page = +params.page;
+    if (params.limit) pagination.limit = +params.limit;
+    return MainModel.find({ userId: id, status: 1 })
+      .skip(pagination.limit * pagination.page - pagination.limit)
+      .limit(pagination.limit)
+      .select("id userId status orderPrice");
   },
   create: async (item) => {
     await MainModel.find()
@@ -34,7 +44,7 @@ module.exports = {
   findNewCart: () => {
     return MainModel.find().sort({ id: -1 }).limit(1);
   },
-  editCart: (_id, params) => {
-    return MainModel.updateOne({ _id }, { userId: params });
+  editCart: (_id, body) => {
+    return MainModel.updateOne({ _id }, body);
   },
 };

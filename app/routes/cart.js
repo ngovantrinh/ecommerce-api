@@ -16,6 +16,7 @@ router.post("/createCart", async (req, res, next) => {
     let data = {
       userId: "",
       status: 0,
+      orderPrice: 0,
     };
     await MainModel.create(data);
     let cart = await MainModel.findNewCart();
@@ -36,9 +37,9 @@ router.post("/add", async (req, res, next) => {
     let productVariant = await productVariantModel.findOneItem(variantId);
 
     let productVariantItem = await cartProductModel.getCartProductByProductId(
-      variantId
+      variantId,
+      cartId
     );
-
     if (!cartId || !variantId || !quantity) {
       res.status(400).json({
         success: false,
@@ -52,7 +53,7 @@ router.post("/add", async (req, res, next) => {
       });
     }
 
-    if (productVariantItem) {
+    if (productVariantItem.length !== 0) {
       return res.status(400).json({
         success: false,
         message: "Item already exists",
@@ -65,6 +66,7 @@ router.post("/add", async (req, res, next) => {
       let data = {
         userId: "",
         status: 0,
+        orderPrice: 0,
       };
 
       await MainModel.create(data);
@@ -219,6 +221,10 @@ router.get("/getCart", async (req, res, next) => {
 
 router.get("/getListOrder", async (req, res, next) => {
   try {
+    let params = {};
+    params.page = req.query.page;
+    params.limit = req.query.limit;
+
     if (constants.extractToken(req) === null)
       return res.status(404).json({
         success: false,
@@ -228,14 +234,105 @@ router.get("/getListOrder", async (req, res, next) => {
       constants.extractToken(req),
       process.env.JWT_SECRET
     );
-    console.log(dataJwt);
+    let listCart = null;
+    if (dataJwt.role === 1) {
+      listCart = await MainModel.getListCartOrder(params, dataJwt.id);
+    }
+    if (listCart.length) {
+      let finalData = [];
+      for (let i = 0; i < listCart.length; i++) {
+        let resData = {
+          idCart: listCart[i]._id,
+          orderPrice: listCart[i].orderPrice,
+          cart: [],
+        };
+        const listProductCart = await cartProductModel.getCartProduct(
+          listCart[i]._id
+        );
+        resData.idCart = listCart[i]._id;
+        let listIdProductVariant = [];
+        listProductCart.forEach((element) => {
+          listIdProductVariant.push(element.variantId);
+        });
 
+        const listProduct = await productVariantModel.listItems(
+          listIdProductVariant
+        );
+        for (let i = 0; i < listProduct.length; i++) {
+          const itemProduct = await ProductModel.listItems(
+            { id: +listProduct[i].product_id },
+            { task: "one" }
+          );
+          let dataVariant = await VariantValueModel.getListValues(
+            listProduct[i].values
+          );
+          dataVariant = dataVariant.map((item) => {
+            let result = {
+              key: "",
+              value: "",
+            };
+            if (item.variant_id === 1) {
+              result.key = "color";
+              result.value = item.value;
+            } else if (item.variant_id === 2) {
+              result.key = "size";
+              result.value = item.value;
+            } else {
+              result.key = "material";
+              result.value = item.value;
+            }
+            return result;
+          });
+          listProductCart.forEach((item) => {
+            if (item.variantId === listProduct[i].id) {
+              let result = {
+                name: listProduct[i].name,
+                image: itemProduct[0].image,
+                quantity: listProduct[i].quantity,
+                quantityBuy: item.quantity,
+                price: listProduct[i].price,
+                salePrice: listProduct[i].salePrice,
+                optionChoose: dataVariant,
+              };
+              resData.cart.push(result);
+            }
+          });
+        }
+        finalData.push(resData);
+      }
+      return res.status(200).json({
+        success: true,
+        page: params.page,
+        limit: params.limit,
+        listOrder: finalData,
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "You don't have any order",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+});
+
+router.put("/paymentOrders", async (req, res, next) => {
+  try {
+    const { cartId, orderPrice } = req.body;
+    let dataUpdate = {
+      orderPrice: orderPrice,
+      status: constants.STATUS_PAYMENTR
+    };
+    await MainModel.editCart(cartId, dataUpdate);
     res.status(200).json({
       success: true,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
+      message: "Something wrong",
     });
   }
 });
@@ -284,7 +381,7 @@ router.put("/addUserToCart", async (req, res, next) => {
         message: "User doesn't exist",
       });
     }
-    await MainModel.editCart(req.body.cartId, dataJwt.id);
+    await MainModel.editCart(req.body.cartId, { userId: dataJwt.id });
     res.status(200).json({
       success: true,
       message: "Update cart success",

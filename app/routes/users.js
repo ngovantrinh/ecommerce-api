@@ -62,7 +62,7 @@ router.post("/update-profile", async (req, res, next) => {
         message: "Don't have token",
       });
     }
-    
+
     let dataJwt = await jwt.verify(
       constants.extractToken(req),
       process.env.JWT_SECRET
@@ -180,7 +180,12 @@ router.post("/login", async (req, res, next) => {
       });
     }
     const access_token = jwt.sign(
-      { id: userInfo._id, username: userInfo.username },
+      {
+        id: userInfo._id,
+        username: userInfo.username,
+        role: userInfo.role,
+        active: userInfo.active,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: "2h",

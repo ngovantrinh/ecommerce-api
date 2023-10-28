@@ -26,6 +26,7 @@ module.exports = {
   DEFAULT_ID: 1,
   USER_DEFAULT_ACTIVE: 1,
   USER_DEFAULT_UNACTIVE: 2,
+  STATUS_PAYMENTR: 1,
   getTime,
   extractToken,
 };
