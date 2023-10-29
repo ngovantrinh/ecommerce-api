@@ -5,7 +5,7 @@ module.exports = {
     return MainModel.findOne({ _id: _id }).select("id userId status");
   },
   getCartByUserId: (userId) => {
-    return MainModel.findOne({ userId: userId }).select("id userId status");
+    return MainModel.findOne({ userId: userId, status: 0 }).select("id userId status");
   },
   getListCartOrder: (params, id) => {
     let pagination = {
