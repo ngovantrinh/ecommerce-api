@@ -21,6 +21,7 @@ router.get("/", async (req, res, next) => {
     params.color = req.query.color;
     params.page = req.query.page;
     params.limit = req.query.limit;
+    params.categoryId = req.body.categoryId
 
     let productVariantItems = await productVariantModel.listItems();
 

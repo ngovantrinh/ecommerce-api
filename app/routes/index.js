@@ -10,5 +10,6 @@ router.use("/upload", require('./uploadImage'));
 router.use("/cupons", require('./cupon'));
 router.use("/cartProduct", require('./cartProduct'));
 router.use("/cart", require('./cart'));
+router.use("/category", require('./category'));
 
 module.exports = router;

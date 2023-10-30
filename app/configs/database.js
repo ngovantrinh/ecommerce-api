@@ -4,7 +4,7 @@ module.exports = {
   database: "project",
   col_items: "items",
   col_product_variant: "product_variant",
-  col_product_detail: "product_detail",
+  col_category: "categories",
   col_user: "users",
   col_comments: "comments",
   col_vatiants: "variants",

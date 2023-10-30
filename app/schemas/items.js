@@ -12,6 +12,7 @@ var schema = new mongoose.Schema(
     salePrice: Number,
     quantity: Number,
     sold: Number,
+    categoryId: String,
     createAt: String,
   },
   { collection: "items" }
