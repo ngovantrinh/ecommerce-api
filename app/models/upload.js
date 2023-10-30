@@ -4,4 +4,7 @@ module.exports = {
   create: (image) => {
     return new MainModel(image).save();
   },
+  findItems: () => {
+    return MainModel.find();
+  }
 };
