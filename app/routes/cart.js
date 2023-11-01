@@ -135,7 +135,6 @@ router.get("/getCart", async (req, res, next) => {
         process.env.JWT_SECRET
       );
     }
-
     if (dataJwt) {
       cart = await MainModel.getCartByUserId(dataJwt.id);
     } else {
@@ -192,7 +191,7 @@ router.get("/getCart", async (req, res, next) => {
         if (item.variantId === listProduct[i].id) {
           let result = {
             name: listProduct[i].name,
-            image: itemProduct[0].image,
+            image: listProduct[i].image,
             quantity: listProduct[i].quantity,
             quantityBuy: item.quantity,
             price: listProduct[i].price,
@@ -323,7 +322,7 @@ router.put("/paymentOrders", async (req, res, next) => {
     const { cartId, orderPrice } = req.body;
     let dataUpdate = {
       orderPrice: orderPrice,
-      status: constants.STATUS_PAYMENTR
+      status: constants.STATUS_PAYMENTR,
     };
     await MainModel.editCart(cartId, dataUpdate);
     res.status(200).json({
