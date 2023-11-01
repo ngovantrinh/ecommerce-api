@@ -345,6 +345,9 @@ router.put("/edit", async (req, res, next) => {
     let productVariant = await productVariantModel.findOneItem(
       productVariantItem[0].variantId
     );
+    console.log(req.body);
+    console.log(productVariant,'productVariant');
+    console.log(productVariantItem,'productVariantItem');
     if (productVariant[0].quantity < quantity) {
       return res.status(400).json({
         success: false,
