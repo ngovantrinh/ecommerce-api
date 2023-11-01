@@ -21,32 +21,28 @@ router.get("/", async (req, res, next) => {
     params.color = req.query.color;
     params.page = req.query.page;
     params.limit = req.query.limit;
-    params.categoryId = req.body.categoryId
-
-    let productVariantItems = await productVariantModel.listItems();
+    params.categoryId = req.body.categoryId;
 
     let variantValueList = await VariantValueModel.listItems();
     let sizeValue = null;
     let colorValue = null;
 
     for (let i = 0; i < variantValueList.length; i++) {
-      if (variantValueList[i].value === params.size) {
+      if (variantValueList[i].id === +params.size) {
         sizeValue = variantValueList[i].id;
       }
-      if (variantValueList[i].value === params.color) {
+      if (variantValueList[i].id === +params.color) {
         colorValue = variantValueList[i].id;
       }
     }
-
+    let arr = [];
+    if (sizeValue) arr.push(sizeValue);
+    if (colorValue) arr.push(colorValue);
+    let productVariantItems = await productVariantModel.listItemsByValues(arr);
     let listProductId = [];
-    for (let i = 0; i < productVariantItems.length; i++) {
-      if (productVariantItems[i].values.includes(sizeValue)) {
-        listProductId.push(productVariantItems[i].product_id);
-      }
-      if (productVariantItems[i].values.includes(colorValue)) {
-        listProductId.push(productVariantItems[i].product_id);
-      }
-    }
+    productVariantItems.forEach((element) => {
+      listProductId.push(element.product_id);
+    });
 
     listProductId = Array.from(new Set(listProductId));
 
@@ -127,7 +123,7 @@ router.get("/:id", async (req, res, next) => {
     if (!newData.length) {
       return res.status(400).json({
         success: false,
-        message: 'Not found product',
+        message: "Not found product",
       });
     }
 

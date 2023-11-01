@@ -5,6 +5,7 @@ module.exports = {
   listItems: (params, option, listProductId) => {
     let sort = {};
     let objWhere = {};
+    let condition = {};
     let pagination = {
       page: 1,
       limit: 10,
@@ -15,27 +16,36 @@ module.exports = {
     if (params.sortField) sort[params.sortField] = params.sortType;
     if (params.page) pagination.page = +params.page;
     if (params.limit) pagination.limit = +params.limit;
-    if (params.categoryId) objWhere.categoryId = params.categoryId;
+    if (params.categoryId) condition.categoryId = params.categoryId;
     if (option.task == "all") {
-      return MainModel.find(
-        {
-          categoryId: objWhere.categoryId,
-        },
-        {
-          name: { $regex: objWhere.name },
-        },
-        {
+      if (condition.categoryId) {
+        return MainModel.find({
           id: {
             $in: [...listProductId],
           },
-        }
-      )
-        .skip(pagination.limit * pagination.page - pagination.limit)
-        .limit(pagination.limit)
-        .select(
-          "id name image images description price salePrice quantity sold createAt"
-        )
-        .sort(sort);
+          name: { $regex: objWhere.name },
+          categoryId: condition.categoryId,
+        })
+          .skip(pagination.limit * pagination.page - pagination.limit)
+          .limit(pagination.limit)
+          .select(
+            "id name image images description price salePrice quantity sold categoryId createAt"
+          )
+          .sort(sort);
+      } else {
+        return MainModel.find({
+          id: {
+            $in: [...listProductId],
+          },
+          name: { $regex: objWhere.name },
+        })
+          .skip(pagination.limit * pagination.page - pagination.limit)
+          .limit(pagination.limit)
+          .select(
+            "id name image images description price salePrice quantity sold categoryId createAt"
+          )
+          .sort(sort);
+      }
     }
 
     if (option.task == "one") {

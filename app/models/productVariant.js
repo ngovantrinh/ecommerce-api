@@ -42,6 +42,21 @@ module.exports = {
       );
     }
   },
+  listItemsByValues: (listId) => {
+    if (listId) {
+      return MainModel.find({
+        values: {
+          $in: [...listId],
+        },
+      }).select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    } else {
+      return MainModel.find().select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    }
+  },
   findOneItem: (id) => {
     return MainModel.find({ id: id }).select(
       "id name values quantity sku price salePrice createAt"
