@@ -191,7 +191,7 @@ router.get("/getCart", async (req, res, next) => {
         if (item.variantId === listProduct[i].id) {
           let result = {
             name: listProduct[i].name,
-            image: listProduct[i].image,
+            image: itemProduct[0].image,
             quantity: listProduct[i].quantity,
             quantityBuy: item.quantity,
             price: listProduct[i].price,
