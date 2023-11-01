@@ -190,6 +190,7 @@ router.get("/getCart", async (req, res, next) => {
       listProductCart.forEach((item) => {
         if (item.variantId === listProduct[i].id) {
           let result = {
+            id:listProduct[i].id,
             name: listProduct[i].name,
             image: itemProduct[0].image,
             quantity: listProduct[i].quantity,
@@ -285,6 +286,7 @@ router.get("/getListOrder", async (req, res, next) => {
           listProductCart.forEach((item) => {
             if (item.variantId === listProduct[i].id) {
               let result = {
+                id:listProduct[i].id,
                 name: listProduct[i].name,
                 image: itemProduct[0].image,
                 quantity: listProduct[i].quantity,
