@@ -17,40 +17,74 @@ router.get("/", async (req, res, next) => {
     let params = {};
     params.keyword = req.query.keyword;
     // params.sortType = default_sort_type;
-    params.size = req.query.size;
-    params.color = req.query.color;
+    // params.size = req.query.size;
+    // params.color = req.query.color;
     params.page = req.query.page;
     params.limit = req.query.limit;
     params.categoryId = req.body.categoryId;
 
-    let variantValueList = await VariantValueModel.listItems();
-    let sizeValue = null;
-    let colorValue = null;
-
-    for (let i = 0; i < variantValueList.length; i++) {
-      if (variantValueList[i].id === +params.size) {
-        sizeValue = variantValueList[i].id;
-      }
-      if (variantValueList[i].id === +params.color) {
-        colorValue = variantValueList[i].id;
-      }
-    }
-    let arr = [];
-    if (sizeValue) arr.push(sizeValue);
-    if (colorValue) arr.push(colorValue);
-    let productVariantItems = await productVariantModel.listItemsByValues(arr);
     let listProductId = [];
-    productVariantItems.forEach((element) => {
-      listProductId.push(element.product_id);
-    });
 
+    let listVariantFind = [];
+
+    if (req.query.color) listVariantFind.push(+req.query.color);
+    if (req.query.size) listVariantFind.push(+req.query.size);
+    if (req.query.material) listVariantFind.push(+req.query.material);
+
+    let productVariantItems = await productVariantModel.listItemsByValues(
+      listVariantFind
+    );
+
+    for (let i = 0; i < productVariantItems.length; i++) {
+      listProductId.push(productVariantItems[i].product_id);
+    }
+
+    const dataItemByName = await MainModel.findByName(params.keyword);
+    const dataItemByCategory = await MainModel.findByCategoryId(
+      params.categoryId
+    );
+
+    const getIdProduct = (listItems) => {
+      let result = [];
+      let finalList = [];
+      listItems.forEach((item) => {
+        result.push(item.id);
+      });
+      if (listProductId.length) {
+        for (let i = 0; i < result.length; i++) {
+          for (let j = 0; j < listProductId.length; j++) {
+            if (result[i] === listProductId[j]) {
+              finalList.push(result[i]);
+            }
+          }
+        }
+      } else {
+        listProductId = result;
+      }
+      listProductId = finalList;
+    };
+    getIdProduct(dataItemByName);
+    getIdProduct(dataItemByCategory);
     listProductId = Array.from(new Set(listProductId));
 
+    if (
+      (req.query.color ||
+        req.query.size ||
+        req.body.categoryId ||
+        req.body.keyword) &&
+      listProductId.length < 1
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Don't find any product",
+      });
+    }
     const dataItemList = await MainModel.listItems(
       params,
       { task: "all" },
       listProductId
     );
+
     const newData = JSON.parse(JSON.stringify(dataItemList));
 
     for (let i = 0; i < newData.length; i++) {
@@ -63,7 +97,6 @@ router.get("/", async (req, res, next) => {
       let size = { key: "size", value: [] };
       let material = { key: "material", value: [] };
       newData[i] = { ...newData[i], option: [] };
-
       productVariantItems.forEach((element) => {
         if (element.product_id === newData[i].id) {
           productVariants.push(element);

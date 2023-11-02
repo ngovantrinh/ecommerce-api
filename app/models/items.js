@@ -18,13 +18,11 @@ module.exports = {
     if (params.limit) pagination.limit = +params.limit;
     if (params.categoryId) condition.categoryId = params.categoryId;
     if (option.task == "all") {
-      if (condition.categoryId) {
+      if (listProductId.length) {
         return MainModel.find({
           id: {
             $in: [...listProductId],
           },
-          name: { $regex: objWhere.name },
-          categoryId: condition.categoryId,
         })
           .skip(pagination.limit * pagination.page - pagination.limit)
           .limit(pagination.limit)
@@ -33,12 +31,7 @@ module.exports = {
           )
           .sort(sort);
       } else {
-        return MainModel.find({
-          id: {
-            $in: [...listProductId],
-          },
-          name: { $regex: objWhere.name },
-        })
+        return MainModel.find()
           .skip(pagination.limit * pagination.page - pagination.limit)
           .limit(pagination.limit)
           .select(
@@ -53,6 +46,23 @@ module.exports = {
         "id name image images description price salePrice quantity sold createAt"
       );
     }
+  },
+  findByCategoryId: (id) => {
+    if (!id) {
+      return MainModel.find().select("id");
+    }
+    return MainModel.find({
+      categoryId: id,
+    }).select("id");
+  },
+  findByName: (params) => {
+    let objWhere = {};
+    if (params !== "" || !params) {
+      objWhere.name = new RegExp(params, "i");
+    }
+    return MainModel.find({
+      name: { $regex: objWhere.name },
+    }).select("id");
   },
   create: (item) => {
     return MainModel.find()

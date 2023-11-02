@@ -43,18 +43,16 @@ module.exports = {
     }
   },
   listItemsByValues: (listId) => {
-    if (listId) {
+    if (listId.length == 2) {
       return MainModel.find({
-        values: {
-          $in: [...listId],
-        },
-      }).select(
-        "id name product_id values quantity sku price salePrice createAt"
-      );
+        values: [...listId],
+      }).select("id name product_id values quantity sku price salePrice createAt");
+    }else if(listId.length == 1){
+      return MainModel.find({
+        values: listId[0],
+      }).select("id name product_id values quantity sku price salePrice createAt");
     } else {
-      return MainModel.find().select(
-        "id name product_id values quantity sku price salePrice createAt"
-      );
+      return MainModel.find().select("id  product_id values");
     }
   },
   findOneItem: (id) => {
