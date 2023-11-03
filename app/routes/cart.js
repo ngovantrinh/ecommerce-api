@@ -106,10 +106,9 @@ router.post("/add", async (req, res, next) => {
   }
 });
 
-router.get("/getCart/:cartId", async (req, res, next) => {
+router.get("/getCart", async (req, res, next) => {
   try {
-    const { cartId } = req.params;
-
+    const { cartId } = req.query;
     let resData = {
       idCart: 0,
       totalPreSale: 0,
