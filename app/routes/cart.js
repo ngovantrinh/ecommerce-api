@@ -134,11 +134,9 @@ router.get("/getCart", async (req, res, next) => {
         process.env.JWT_SECRET
       );
     }
-    if (dataJwt) {
-      cart = await MainModel.getCartByUserId(dataJwt.id);
-    } else {
-      cart = await MainModel.getCart(cartId);
-    }
+
+    cart = await MainModel.getCartByUserId(dataJwt.id);
+    cart = await MainModel.getCart(cartId);
     if (!cart) {
       return res.status(400).json({
         success: false,
@@ -189,7 +187,7 @@ router.get("/getCart", async (req, res, next) => {
       listProductCart.forEach((item) => {
         if (item.variantId === listProduct[i].id) {
           let result = {
-            id:item.id,
+            id: item.id,
             name: listProduct[i].name,
             image: itemProduct[0].image,
             quantity: listProduct[i].quantity,
@@ -285,7 +283,7 @@ router.get("/getListOrder", async (req, res, next) => {
           listProductCart.forEach((item) => {
             if (item.variantId === listProduct[i].id) {
               let result = {
-                id:item.id,
+                id: item.id,
                 name: listProduct[i].name,
                 image: itemProduct[0].image,
                 quantity: listProduct[i].quantity,
@@ -343,7 +341,7 @@ router.put("/edit", async (req, res, next) => {
     let productVariantItem = await cartProductModel.getCartProductById(id);
     let productVariant = await productVariantModel.findOneItem(
       productVariantItem[0].variantId
-      );
+    );
     if (productVariant[0].quantity < quantity) {
       return res.status(400).json({
         success: false,
