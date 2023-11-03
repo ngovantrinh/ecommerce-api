@@ -4,8 +4,11 @@ module.exports = {
   getCart: (_id) => {
     return MainModel.findOne({ _id: _id }).select("id userId status");
   },
-  getCartByUserId: (userId) => {
-    return MainModel.findOne({ userId: userId, status: 0 }).select("id userId status");
+  getCartByUserId: (data) => {
+    if(!data) return
+    return MainModel.findOne({ userId: data.userId, status: 0 }).select(
+      "id userId status"
+    );
   },
   getListCartOrder: (params, id) => {
     let pagination = {

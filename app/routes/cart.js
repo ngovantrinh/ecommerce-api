@@ -135,13 +135,13 @@ router.get("/getCart", async (req, res, next) => {
         process.env.JWT_SECRET
       );
     }
-
-    let cartByUserId = await MainModel.getCartByUserId(dataJwt.id);
+    
+    let cartByUserId = await MainModel.getCartByUserId(dataJwt);
     let cartByCartId = await MainModel.getCart(cartId);
+
     if (cartByUserId) cart = cartByUserId;
-
     if (cartByCartId) cart = cartByCartId;
-
+    
     if (!cart) {
       return res.status(400).json({
         success: false,
