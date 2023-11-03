@@ -113,6 +113,7 @@ router.get("/getCart", async (req, res, next) => {
       idCart: 0,
       totalPreSale: 0,
       totalSale: 0,
+      userId: '',
       cart: [],
     };
     let totalPreSale = 0;
@@ -202,6 +203,7 @@ router.get("/getCart", async (req, res, next) => {
         }
       });
     }
+    resData.userId = cart.userId
     resData.totalPreSale = totalPreSale;
     resData.totalSale = totalSale;
 
