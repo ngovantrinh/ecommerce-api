@@ -113,7 +113,7 @@ router.get("/getCart", async (req, res, next) => {
       idCart: 0,
       totalPreSale: 0,
       totalSale: 0,
-      userId: '',
+      userId: "",
       cart: [],
     };
     let totalPreSale = 0;
@@ -136,8 +136,12 @@ router.get("/getCart", async (req, res, next) => {
       );
     }
 
-    cart = await MainModel.getCartByUserId(dataJwt.id);
-    cart = await MainModel.getCart(cartId);
+    let cartByUserId = await MainModel.getCartByUserId(dataJwt.id);
+    let cartByCartId = await MainModel.getCart(cartId);
+    if (cartByUserId) cart = cartByUserId;
+
+    if (cartByCartId) cart = cartByCartId;
+
     if (!cart) {
       return res.status(400).json({
         success: false,
@@ -203,7 +207,7 @@ router.get("/getCart", async (req, res, next) => {
         }
       });
     }
-    resData.userId = cart.userId
+    resData.userId = cart.userId;
     resData.totalPreSale = totalPreSale;
     resData.totalSale = totalSale;
 
