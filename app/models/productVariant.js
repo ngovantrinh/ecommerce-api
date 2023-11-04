@@ -52,7 +52,7 @@ module.exports = {
         values: listId[0],
       }).select("id name product_id values quantity sku price salePrice createAt");
     } else {
-      return MainModel.find().select("id  product_id values");
+      return MainModel.find().select("id name product_id values quantity sku price salePrice createAt");
     }
   },
   findOneItem: (id) => {
