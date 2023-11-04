@@ -6,7 +6,7 @@ module.exports = {
   },
   getCartByUserId: (data) => {
     if(!data) return
-    return MainModel.findOne({ userId: data.userId, status: 0 }).select(
+    return MainModel.findOne({ userId: data.id, status: 0 }).select(
       "id userId status"
     );
   },

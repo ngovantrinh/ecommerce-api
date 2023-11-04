@@ -141,7 +141,7 @@ router.get("/getCart", async (req, res, next) => {
 
     if (cartByUserId) cart = cartByUserId;
     if (cartByCartId) cart = cartByCartId;
-    
+    console.log(cartId,dataJwt);
     if (!cart) {
       return res.status(400).json({
         success: false,
