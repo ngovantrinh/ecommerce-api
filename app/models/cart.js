@@ -1,13 +1,33 @@
 const MainModel = require(__path_schemas + "cart");
 const constants = require("../constants/constants");
+
+const DEFAULT_PAYMENT_CART = 3;
 module.exports = {
   getCart: (_id) => {
-    return MainModel.findOne({ _id: _id }).select("id userId status");
+    return MainModel.findOne({ _id: _id }).select(
+      "id userId status orderPrice"
+    );
   },
   getCartByUserId: (data) => {
-    if(!data) return
+    if (!data) return;
     return MainModel.findOne({ userId: data.id, status: 0 }).select(
-      "id userId status"
+      "id userId status orderPrice"
+    );
+  },
+  showAllUserCarts: (user) => {
+    return MainModel.find({
+      userId: user.id,
+      status: { $ne: 0 },
+    }).select("id userId status orderPrice");
+  },
+  getCarts: () => {
+    return MainModel.find({ status: { $ne: 0 } }).select(
+      "id userId status orderPrice"
+    );
+  },
+  getUserCart: (id) => {
+    return MainModel.find({ userId: id, status: DEFAULT_PAYMENT_CART }).select(
+      "id userId status orderPrice"
     );
   },
   getListCartOrder: (params, id) => {

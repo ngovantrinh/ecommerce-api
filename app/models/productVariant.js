@@ -56,7 +56,7 @@ module.exports = {
     }
   },
   findOneItem: (id) => {
-    return MainModel.find({ id: id }).select(
+    return MainModel.find({ id: id}).select(
       "id name values quantity sku price salePrice createAt"
     );
   },

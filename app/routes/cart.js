@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const constants = require("../constants/constants");
 const jwt = require("jsonwebtoken");
+const cart = require("../models/cart");
 
 const controllerName = "cart";
 const MainModel = require(__path_models + controllerName);
@@ -9,7 +10,7 @@ const cartProductModel = require(__path_models + "cartProduct");
 const productVariantModel = require(__path_models + "productVariant");
 const ProductModel = require(__path_models + "items");
 const VariantValueModel = require(__path_models + "variantValue");
-const Users = require(__path_schemas + "users");
+const UserModal = require(__path_schemas + "users");
 
 router.post("/createCart", async (req, res, next) => {
   try {
@@ -106,6 +107,132 @@ router.post("/add", async (req, res, next) => {
   }
 });
 
+router.get("/all", async (req, res, next) => {
+  try {
+    let dataJwt = null;
+    let carts = null;
+    let listCarts = [];
+
+    if (constants.extractToken(req)) {
+      dataJwt = await jwt.verify(
+        constants.extractToken(req),
+        process.env.JWT_SECRET
+      );
+    }
+
+    if (!dataJwt) {
+      return res.status(400).json({
+        success: false,
+        message: "You must login first",
+      });
+    }
+
+    // check role user and get carts
+    if (dataJwt.role === 1) {
+      carts = await MainModel.showAllUserCarts(dataJwt);
+    } else {
+      // if role !== 1 return all carts
+      carts = await MainModel.getCarts();
+    }
+
+    if (!carts.length) {
+      return res.status(400).json({
+        success: false,
+        message: "You don't have any cart",
+      });
+    }
+
+    for (let i = 0; i < carts.length; i++) {
+      let resData = {
+        idCart: 0,
+        totalPreSale: 0,
+        totalSale: 0,
+        userId: "",
+        status: 0,
+        cart: [],
+      };
+      let totalPreSale = 0;
+      let totalSale = 0;
+      const listProductCart = await cartProductModel.getCartProduct(
+        carts[i]._id
+      );
+
+      resData.idCart = carts[i]._id;
+      let listIdProductVariant = [];
+      listProductCart.forEach((element) => {
+        listIdProductVariant.push(element.variantId);
+      });
+      const listProduct = await productVariantModel.listItems(
+        listIdProductVariant
+      );
+      for (let i = 0; i < listProduct.length; i++) {
+        const itemProduct = await ProductModel.listItems(
+          { id: +listProduct[i].product_id },
+          { task: "one" }
+        );
+        let dataVariant = await VariantValueModel.getListValues(
+          listProduct[i].values
+        );
+        dataVariant = dataVariant.map((item) => {
+          let result = {
+            key: "",
+            value: "",
+          };
+          if (item.variant_id === 1) {
+            result.key = "color";
+            result.value = item.value;
+          } else if (item.variant_id === 2) {
+            result.key = "size";
+            result.value = item.value;
+          } else {
+            result.key = "material";
+            result.value = item.value;
+          }
+          return result;
+        });
+        listProductCart.forEach((item) => {
+          if (item.variantId === listProduct[i].id) {
+            let result = {
+              id: item.id,
+              name: listProduct[i].name,
+              image: itemProduct[0].image,
+              quantity: listProduct[i].quantity,
+              quantityBuy: item.quantity,
+              price: listProduct[i].price,
+              salePrice: listProduct[i].salePrice,
+              optionChoose: dataVariant,
+            };
+            totalPreSale += listProduct[i].price * item.quantity;
+            totalSale += listProduct[i].salePrice * item.quantity;
+            resData.cart.push(result);
+          }
+        });
+      }
+      resData.status = carts[i].status;
+      resData.userId = carts[i].userId;
+      resData.totalPreSale = totalPreSale;
+      resData.totalSale = totalSale;
+      listCarts = [...listCarts, resData];
+    }
+
+    if (!listCarts.length) {
+      return res.status(400).json({
+        success: false,
+        message: "No cart",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: listCarts,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+    });
+  }
+});
+
 router.get("/getCart", async (req, res, next) => {
   try {
     const { cartId } = req.query;
@@ -135,13 +262,13 @@ router.get("/getCart", async (req, res, next) => {
         process.env.JWT_SECRET
       );
     }
-    
+
     let cartByUserId = await MainModel.getCartByUserId(dataJwt);
     let cartByCartId = await MainModel.getCart(cartId);
 
     if (cartByUserId) cart = cartByUserId;
     if (cartByCartId) cart = cartByCartId;
-    console.log(cartId,dataJwt);
+
     if (!cart) {
       return res.status(400).json({
         success: false,
@@ -367,6 +494,28 @@ router.put("/edit", async (req, res, next) => {
   }
 });
 
+router.put("/revenue", async (req, res, next) => {
+  try {
+    let dataJwt = await jwt.verify(
+      constants.extractToken(req),
+      process.env.JWT_SECRET
+    );
+
+    const { username } = dataJwt;
+
+    const userInfo = await UserModal.findUser(username);
+
+    if (userInfo.role === constants.default_role) {
+      const listCart = MainModel.getUserCart(userInfo._id);
+    }
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Update cart wrong",
+    });
+  }
+});
+
 router.put("/addUserToCart", async (req, res, next) => {
   try {
     if (constants.extractToken(req) === null)
@@ -378,7 +527,7 @@ router.put("/addUserToCart", async (req, res, next) => {
       constants.extractToken(req),
       process.env.JWT_SECRET
     );
-    const userInfo = await Users.findOne({ username: dataJwt.username });
+    const userInfo = await UserModal.findOne({ username: dataJwt.username });
     if (!userInfo) {
       return res.status(401).json({
         success: false,

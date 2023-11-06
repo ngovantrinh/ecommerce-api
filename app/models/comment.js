@@ -4,8 +4,8 @@ module.exports = {
     create: (comment) => {
       return new MainModel(comment).save();
     },
-    // findUser: (user) => {
-    //     return new MainModel.findOne(user).lean();
-    //   },
+    findCommentByProduct: (productId) => {
+        return new MainModel.find({productId});
+      },
   };
   

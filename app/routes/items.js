@@ -8,6 +8,7 @@ const MainModel = require(__path_models + controllerName);
 const productVariantModel = require(__path_models + "productVariant");
 // const productDetailModel = require(__path_models + "productDetail");
 const VariantValueModel = require(__path_models + "variantValue");
+const CommentModel = require(__path_models + "comment");
 
 // const default_sort_field = "createAt";
 // const default_sort_type = "desc";
@@ -150,8 +151,9 @@ router.get("/:id", async (req, res, next) => {
       { id: +req.params.id },
       { task: "one" }
     );
-
     const newData = JSON.parse(JSON.stringify(data));
+
+    let comment = await CommentModel.findCommentByProduct(newData[0].id);
 
     if (!newData.length) {
       return res.status(400).json({
@@ -200,7 +202,7 @@ router.get("/:id", async (req, res, next) => {
     if (size.value.length) newData[0].option.push(size);
     if (material.value.length) newData[0].option.push(material);
 
-    // newData[0].option = [color, size];
+    if (comment) newData[0].comment = comment;
     newData[0].variants = productVariants;
 
     res.status(200).json({
