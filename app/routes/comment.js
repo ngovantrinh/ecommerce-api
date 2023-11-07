@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const constants = require("../constants/constants");
 
+const jwt = require('jsonwebtoken')
 const controllerName = "comment";
 const MainModel = require(__path_models + controllerName);
 const productModal = require(__path_schemas + "items");
@@ -17,8 +18,6 @@ router.post("/add/:productId", async (req, res, next) => {
         message: "Product doesn't exist",
       });
     }
-    
-    console.log('comment');
     if (constants.extractToken(req)) {
       dataJwt = await jwt.verify(
         constants.extractToken(req),

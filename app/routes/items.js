@@ -152,9 +152,10 @@ router.get("/:id", async (req, res, next) => {
       { task: "one" }
     );
     const newData = JSON.parse(JSON.stringify(data));
-
-    let comment = await CommentModel.findCommentByProduct(newData[0].id);
-
+    let comment = await CommentModel.findCommentByProduct(newData[0]._id);
+    
+    
+    console.log(comment,'run');
     if (!newData.length) {
       return res.status(400).json({
         success: false,
