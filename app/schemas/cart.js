@@ -6,7 +6,8 @@ var schema = new mongoose.Schema(
     id: Number,
     userId: String,
     status: Number,
-    orderPrice: Number
+    orderPrice: Number,
+    createAt: String
   },
 );
 

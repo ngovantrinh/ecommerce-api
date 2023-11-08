@@ -5,29 +5,29 @@ const DEFAULT_PAYMENT_CART = 3;
 module.exports = {
   getCart: (_id) => {
     return MainModel.findOne({ _id: _id }).select(
-      "id userId status orderPrice"
+      "id userId status orderPrice createAt"
     );
   },
   getCartByUserId: (data) => {
     if (!data) return;
     return MainModel.findOne({ userId: data.id, status: 0 }).select(
-      "id userId status orderPrice"
+      "id userId status orderPrice createAt"
     );
   },
   showAllUserCarts: (user) => {
     return MainModel.find({
       userId: user.id,
       status: { $ne: 0 },
-    }).select("id userId status orderPrice");
+    }).select("id userId status orderPrice createAt");
   },
   getCarts: () => {
     return MainModel.find({ status: { $ne: 0 } }).select(
-      "id userId status orderPrice"
+      "id userId status orderPrice createAt"
     );
   },
-  getUserCart: (id) => {
-    return MainModel.find({ userId: id, status: DEFAULT_PAYMENT_CART }).select(
-      "id userId status orderPrice"
+  getUserCart: () => {
+    return MainModel.find({ status: DEFAULT_PAYMENT_CART }).select(
+      "id userId status orderPrice createAt"
     );
   },
   getListCartOrder: (params, id) => {
@@ -41,7 +41,7 @@ module.exports = {
     return MainModel.find({ userId: id, status: 1 })
       .skip(pagination.limit * pagination.page - pagination.limit)
       .limit(pagination.limit)
-      .select("id userId status orderPrice");
+      .select("id userId status orderPrice createAt");
   },
   create: async (item) => {
     await MainModel.find()

@@ -18,6 +18,7 @@ router.post("/createCart", async (req, res, next) => {
       userId: "",
       status: 0,
       orderPrice: 0,
+      createAt: constants.getTime(),
     };
     await MainModel.create(data);
     let cart = await MainModel.findNewCart();
@@ -68,6 +69,7 @@ router.post("/add", async (req, res, next) => {
         userId: "",
         status: 0,
         orderPrice: 0,
+        createAt: constants.getTime(),
       };
 
       await MainModel.create(data);
@@ -107,6 +109,7 @@ router.post("/add", async (req, res, next) => {
   }
 });
 
+// get cart by userId and role
 router.get("/all", async (req, res, next) => {
   try {
     let dataJwt = null;
@@ -149,6 +152,7 @@ router.get("/all", async (req, res, next) => {
         totalSale: 0,
         userId: "",
         status: 0,
+        createAt: "",
         cart: [],
       };
       let totalPreSale = 0;
@@ -210,6 +214,7 @@ router.get("/all", async (req, res, next) => {
       }
       resData.status = carts[i].status;
       resData.userId = carts[i].userId;
+      resData.createAt = carts[i].createAt;
       resData.totalPreSale = totalPreSale;
       resData.totalSale = totalSale;
       listCarts = [...listCarts, resData];
@@ -233,6 +238,7 @@ router.get("/all", async (req, res, next) => {
   }
 });
 
+// get cart pendding
 router.get("/getCart", async (req, res, next) => {
   try {
     const { cartId } = req.query;
@@ -494,24 +500,130 @@ router.put("/edit", async (req, res, next) => {
   }
 });
 
-router.put("/revenue", async (req, res, next) => {
+router.get("/revenue", async (req, res, next) => {
   try {
-    let dataJwt = await jwt.verify(
-      constants.extractToken(req),
-      process.env.JWT_SECRET
-    );
+    // let dataJwt = await jwt.verify(
+    //   constants.extractToken(req),
+    //   process.env.JWT_SECRET
+    // );
+    let finalListCarts = [];
+    let carts = [];
+    let listCart = await MainModel.getUserCart();
+    let totalRevenue = 0;
+    if (req.query.month && req.query.year) {
+      listCart.forEach((item) => {
+        let time = item.createAt.split(" ")[0];
+        time = time.split("-").reverse().join("-");
 
-    const { username } = dataJwt;
+        let month = new Date(time);
+        let year = new Date(time);
+        if (
+          month.getMonth() + 1 === +req.query.month &&
+          year.getFullYear() === +req.query.year
+        ) {
+          carts.push(item);
+        }
+      });
+    } else if (req.query.year) {
+      listCart.forEach((item) => {
+        let time = item.createAt.split(" ")[0];
+        time = time.split("-").reverse().join("-");
 
-    const userInfo = await UserModal.findUser(username);
-
-    if (userInfo.role === constants.default_role) {
-      const listCart = MainModel.getUserCart(userInfo._id);
+        let year = new Date(time);
+        if (year.getFullYear() === +req.query.year) {
+          carts.push(item);
+        }
+      });
     }
+
+    carts.forEach((item) => {
+      totalRevenue += item.orderPrice;
+    });
+
+    for (let i = 0; i < carts.length; i++) {
+      let resData = {
+        idCart: 0,
+        totalPreSale: 0,
+        totalSale: 0,
+        userId: "",
+        status: 0,
+        createAt: "",
+        cart: [],
+      };
+      let totalPreSale = 0;
+      let totalSale = 0;
+      const listProductCart = await cartProductModel.getCartProduct(
+        carts[i]._id
+      );
+
+      resData.idCart = carts[i]._id;
+      let listIdProductVariant = [];
+      listProductCart.forEach((element) => {
+        listIdProductVariant.push(element.variantId);
+      });
+      const listProduct = await productVariantModel.listItems(
+        listIdProductVariant
+      );
+      for (let i = 0; i < listProduct.length; i++) {
+        const itemProduct = await ProductModel.listItems(
+          { id: +listProduct[i].product_id },
+          { task: "one" }
+        );
+        let dataVariant = await VariantValueModel.getListValues(
+          listProduct[i].values
+        );
+        dataVariant = dataVariant.map((item) => {
+          let result = {
+            key: "",
+            value: "",
+          };
+          if (item.variant_id === 1) {
+            result.key = "color";
+            result.value = item.value;
+          } else if (item.variant_id === 2) {
+            result.key = "size";
+            result.value = item.value;
+          } else {
+            result.key = "material";
+            result.value = item.value;
+          }
+          return result;
+        });
+        listProductCart.forEach((item) => {
+          if (item.variantId === listProduct[i].id) {
+            let result = {
+              id: item.id,
+              name: listProduct[i].name,
+              image: itemProduct[0].image,
+              quantity: listProduct[i].quantity,
+              quantityBuy: item.quantity,
+              price: listProduct[i].price,
+              salePrice: listProduct[i].salePrice,
+              optionChoose: dataVariant,
+            };
+            totalPreSale += listProduct[i].price * item.quantity;
+            totalSale += listProduct[i].salePrice * item.quantity;
+            resData.cart.push(result);
+          }
+        });
+      }
+
+      resData.status = carts[i].status;
+      resData.userId = carts[i].userId;
+      resData.createAt = carts[i].createAt;
+      resData.totalPreSale = totalPreSale;
+      resData.totalSale = totalSale;
+      finalListCarts = [...finalListCarts, resData];
+    }
+
+    return res.status(200).json({
+      success: true,
+      listCart: finalListCarts,
+      total: totalRevenue,
+    });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
-      message: "Update cart wrong",
     });
   }
 });
