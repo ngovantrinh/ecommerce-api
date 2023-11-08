@@ -258,7 +258,6 @@ router.get("/getCart", async (req, res, next) => {
         message: "Not have any product in your cart",
       });
     }
-
     let dataJwt = null;
     let cart = null;
 
@@ -488,6 +487,22 @@ router.put("/edit", async (req, res, next) => {
       });
     }
     await cartProductModel.editItem(req.body);
+    res.status(200).json({
+      success: true,
+      message: "Update cart success",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Update cart wrong",
+    });
+  }
+});
+
+router.put("/status/change", async (req, res, next) => {
+  try {
+    const { cartId, status } = req.body;
+    await MainModel.editCart(cartId, { status });
     res.status(200).json({
       success: true,
       message: "Update cart success",
