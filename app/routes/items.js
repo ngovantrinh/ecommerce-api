@@ -86,6 +86,10 @@ router.get("/", async (req, res, next) => {
       listProductId
     );
 
+    productVariantItems = await productVariantModel.findByProductId(
+      listProductId
+    );
+
     const newData = JSON.parse(JSON.stringify(dataItemList));
 
     for (let i = 0; i < newData.length; i++) {

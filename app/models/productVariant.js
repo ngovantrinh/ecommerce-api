@@ -42,21 +42,42 @@ module.exports = {
       );
     }
   },
+  findByProductId: (listId) => {
+    if (listId) {
+      return MainModel.find({
+        product_id: {
+          $in: [...listId],
+        },
+      }).select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    } else {
+      return MainModel.find().select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    }
+  },
   listItemsByValues: (listId) => {
     if (listId.length == 2) {
       return MainModel.find({
         values: [...listId],
-      }).select("id name product_id values quantity sku price salePrice createAt");
-    }else if(listId.length == 1){
+      }).select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
+    } else if (listId.length == 1) {
       return MainModel.find({
         values: listId[0],
-      }).select("id name product_id values quantity sku price salePrice createAt");
+      }).select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
     } else {
-      return MainModel.find().select("id name product_id values quantity sku price salePrice createAt");
+      return MainModel.find().select(
+        "id name product_id values quantity sku price salePrice createAt"
+      );
     }
   },
   findOneItem: (id) => {
-    return MainModel.find({ id: id}).select(
+    return MainModel.find({ id: id }).select(
       "id name values quantity sku price salePrice createAt"
     );
   },
