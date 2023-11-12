@@ -148,8 +148,7 @@ router.get("/all", async (req, res, next) => {
     for (let i = 0; i < carts.length; i++) {
       let resData = {
         idCart: 0,
-        totalPreSale: 0,
-        totalSale: 0,
+        orderPrice: 0,
         userId: "",
         status: 0,
         createAt: "",
@@ -215,8 +214,7 @@ router.get("/all", async (req, res, next) => {
       resData.status = carts[i].status;
       resData.userId = carts[i].userId;
       resData.createAt = carts[i].createAt;
-      resData.totalPreSale = totalPreSale;
-      resData.totalSale = totalSale;
+      resData.orderPrice = carts[i].orderPrice;
       listCarts = [...listCarts, resData];
     }
 
