@@ -68,7 +68,6 @@ module.exports = {
     return MainModel.find().sort({ id: -1 }).limit(1);
   },
   editCart: (_id, body) => {
-    console.log(_id,body);
     return MainModel.updateOne({ _id }, body);
   },
 };
