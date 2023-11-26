@@ -13,6 +13,7 @@ const CommentModel = require(__path_models + "comment");
 // const default_sort_field = "createAt";
 // const default_sort_type = "desc";
 
+// get all
 router.get("/", async (req, res, next) => {
   try {
     let params = {};
@@ -147,6 +148,8 @@ router.get("/", async (req, res, next) => {
     });
   }
 });
+
+// get one
 router.get("/:id", async (req, res, next) => {
   try {
     let productVariantItems = await productVariantModel.listItems();
@@ -221,6 +224,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// add item
 router.post("/add", async (req, res, next) => {
   try {
     let params = {

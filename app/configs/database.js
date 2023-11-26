@@ -3,6 +3,7 @@ module.exports = {
   password: "trinh123",
   database: "project",
   col_items: "items",
+  col_product_sold: "product_solds",
   col_product_variant: "product_variant",
   col_category: "categories",
   col_user: "users",

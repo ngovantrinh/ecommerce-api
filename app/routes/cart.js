@@ -7,6 +7,7 @@ const cart = require("../models/cart");
 const controllerName = "cart";
 const MainModel = require(__path_models + controllerName);
 const cartProductModel = require(__path_models + "cartProduct");
+const productSoldModel = require(__path_models + "productSold");
 const productVariantModel = require(__path_models + "productVariant");
 const ProductModel = require(__path_models + "items");
 const VariantValueModel = require(__path_models + "variantValue");
@@ -452,14 +453,17 @@ router.get("/getListOrder", async (req, res, next) => {
   }
 });
 
+// thanh toán
 router.put("/paymentOrders", async (req, res, next) => {
   try {
-    const { cartId, orderPrice } = req.body;
+    const { cartId, orderPrice, quantity } = req.body;
     let dataUpdate = {
       orderPrice: orderPrice,
       status: constants.STATUS_PAYMENTR,
     };
+    const productSold = await productSoldModel.findItem();
     await MainModel.editCart(cartId, dataUpdate);
+    await productSoldModel.editQuantity(productSold[0],quantity);
     res.status(200).json({
       success: true,
     });
