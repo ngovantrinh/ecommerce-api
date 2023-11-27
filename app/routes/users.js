@@ -183,7 +183,9 @@ router.post("/login", async (req, res, next) => {
       {
         id: userInfo._id,
         username: userInfo.username,
+        displayName: userInfo.displayName,
         role: userInfo.role,
+        photoUrl: userInfo.photoUrl,
         active: userInfo.active,
       },
       process.env.JWT_SECRET,

@@ -6,7 +6,12 @@ module.exports = {
   },
   findCommentByProduct: (id) => {
     return MainModel.findOne({ productId: id }).select(
-      "userId content productId"
+      "userInfo content productId"
+    );
+  },
+  getListComment: () => {
+    return MainModel.find().select(
+      "userInfo content productId"
     );
   },
 };

@@ -31,8 +31,13 @@ router.post("/add/:productId", async (req, res, next) => {
         message: "Hey you must login before commenting",
       });
     }
-
     let comment = {
+      userInfo: {
+        userName: dataJwt.username,
+        displayName: dataJwt.displayName,
+        photoUrl: dataJwt.photoUrl,
+        role: dataJwt.role,
+      },
       userId: dataJwt.id,
       content: req.body.content,
       productId: req.params.productId,
@@ -50,43 +55,5 @@ router.post("/add/:productId", async (req, res, next) => {
   next();
 });
 
-// router.get("/:productId", async (req, res, next) => {
-//   try {
-//     const productItem = await product.findOne({ id: req.params.productId });
-//     if (!productItem) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Product doesn't exist",
-//       });
-//     }
-
-//     let comment = {
-//       id: makeId(),
-//       userId: req.body.userId,
-//       content: req.body.content,
-//       productId: req.params.productId,
-//     };
-//     await MainModel.create(comment);
-//     res.status(200).json({
-//       success: true,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//     });
-//   }
-
-//   next();
-// });
 
 module.exports = router;
-
-makeId = (number) => {
-  let text = "";
-  let possible = "ABCDEGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  for (let i = 0; i < number; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
-};

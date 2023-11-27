@@ -159,10 +159,8 @@ router.get("/:id", async (req, res, next) => {
       { task: "one" }
     );
     const newData = JSON.parse(JSON.stringify(data));
-    let comment = await CommentModel.findCommentByProduct(newData[0]._id);
-    
-    
-    console.log(comment,'run');
+    let comment = await CommentModel.getListComment();
+
     if (!newData.length) {
       return res.status(400).json({
         success: false,
@@ -210,7 +208,9 @@ router.get("/:id", async (req, res, next) => {
     if (size.value.length) newData[0].option.push(size);
     if (material.value.length) newData[0].option.push(material);
 
-    if (comment) newData[0].comment = comment;
+    if (comment) {
+      newData[0].comment = comment;
+    }
     newData[0].variants = productVariants;
 
     res.status(200).json({
