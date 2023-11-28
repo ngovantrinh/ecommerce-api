@@ -34,7 +34,7 @@ router.post("/add/:productId", async (req, res, next) => {
     let comment = {
       productId: req.params.productId,
       content: req.body.content,
-      isActive: true,
+      isActive: false,
       userInfo: {
         userId: dataJwt.id,
         userName: dataJwt.username,
