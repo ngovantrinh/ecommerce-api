@@ -100,6 +100,7 @@ router.get("/", async (req, res, next) => {
         key: "color",
         value: [],
       };
+      let comment = await CommentModel.findCommentByProduct(newData[i]._id);
       let size = { key: "size", value: [] };
       let material = { key: "material", value: [] };
       newData[i] = { ...newData[i], option: [] };
@@ -129,6 +130,9 @@ router.get("/", async (req, res, next) => {
           });
         }
       });
+      if (comment) {
+        newData[i].comment = comment;
+      }
       if (color.value.length) newData[i].option.push(color);
       if (size.value.length) newData[i].option.push(size);
       if (material.value.length) newData[i].option.push(material);
