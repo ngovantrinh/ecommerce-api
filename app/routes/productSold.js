@@ -11,7 +11,10 @@ router.get("/total", async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: { quantity: productSold[0].quantity },
+      data: {
+        quantity: productSold[0].quantity,
+        salesProfit: productSold[0].salesProfit,
+      },
     });
   } catch (error) {
     res.status(400).json({

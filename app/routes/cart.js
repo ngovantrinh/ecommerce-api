@@ -463,7 +463,7 @@ router.put("/paymentOrders", async (req, res, next) => {
     };
     const productSold = await productSoldModel.findItem();
     await MainModel.editCart(cartId, dataUpdate);
-    await productSoldModel.editQuantity(productSold[0],quantity);
+    await productSoldModel.editQuantity(productSold[0],quantity,orderPrice);
     res.status(200).json({
       success: true,
     });
