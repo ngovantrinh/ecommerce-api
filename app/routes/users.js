@@ -298,4 +298,20 @@ router.get("/userDetail", async (req, res, next) => {
   }
 });
 
+router.get("/maintenance/location", async (req, res, next) => {
+  // res.send('Get all  items')
+  try {
+    let data = constants.locationMaintenance.data
+    return res.status(200).json({
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+});
+
 module.exports = router;
