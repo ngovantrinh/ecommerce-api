@@ -13,4 +13,7 @@ module.exports = {
   create: (newData) => {
     return new MainModel(newData).save();
   },
+  deleteItem: (params) => {
+    return MainModel.findOneAndDelete({ _id: params.id });
+  },
 };

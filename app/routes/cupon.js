@@ -41,7 +41,6 @@ router.post("/add", async (req, res, next) => {
 
 router.post("/check", async (req, res, next) => {
   try {
-    console.log(req.body.cuponCode);
     const data = await MainModel.findByCode(req.body.cuponCode);
     if (!data) {
       return res.status(400).json({
@@ -55,6 +54,20 @@ router.post("/check", async (req, res, next) => {
     });
   } catch (error) {
     res.status(400).json({
+      success: false,
+    });
+  }
+});
+
+router.delete("/delete/:id", async (req, res, next) => {
+  try {
+    await MainModel.deleteItem(req.params);
+    return res.status(200).json({
+      success: true,
+      message: 'Delete success!'
+    });
+  } catch (error) {
+    return res.status(400).json({
       success: false,
     });
   }
